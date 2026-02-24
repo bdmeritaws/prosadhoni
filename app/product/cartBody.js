@@ -7,7 +7,7 @@ import ProductCart from "@/app/product/productCart";
 import process from "next/dist/build/webpack/loaders/resolve-url-loader/lib/postcss";
 import AddToCart from "@/app/common/addToCart";
 
-const AppURL = process.env.NEXT_PUBLIC_BASE_URL;
+const AppURL = process.env.API_BASE_URL;
 
 function CartBody(props) {
     const dispatch = useDispatch();

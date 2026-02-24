@@ -5,7 +5,7 @@ import {modalCheckOrder} from "@/app/redux/product/productSlice";
 import {useDispatch} from "react-redux";
 import {useRouter} from "next/navigation";
 
-const AppURL = process.env.NEXT_PUBLIC_BASE_URL;
+const AppURL = process.env.API_BASE_URL;
 
 
 function OrderDetails({params}) {

@@ -5,7 +5,7 @@ import ModalSideBar from "@/app/common/modalSideBar";
 import React from "react";
 import ModalOrderConfirmed from "@/app/common/modalOrderConfirmed";
 
-const AppURL = process.env.NEXT_PUBLIC_BASE_URL;
+const AppURL = process.env.API_BASE_URL;
 const getShopSlider = async () => {
     const url = AppURL + "shop_slider";
     const result = await fetch(url, {

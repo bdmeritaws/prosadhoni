@@ -11,7 +11,7 @@ import Image from "next/image";
 import {categorySlag} from "@/app/redux/product/productSlice";
 
 
-const AppURL = process.env.NEXT_PUBLIC_BASE_URL;
+const AppURL = process.env.API_BASE_URL;
 
 function ProductCart(props) {
     const {type} = props;

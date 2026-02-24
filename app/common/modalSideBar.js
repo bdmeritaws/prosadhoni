@@ -6,7 +6,7 @@ import {addToCart, deleteSingleProduct, modalCheck, modalCheckOrder} from "@/app
 import {useDispatch, useSelector} from "react-redux";
 import process from "next/dist/build/webpack/loaders/resolve-url-loader/lib/postcss";
 
-const AppURL = process.env.NEXT_PUBLIC_BASE_URL;
+const AppURL = process.env.API_BASE_URL;
 
 function ModalSideBar(props) {
     const productId = "";

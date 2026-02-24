@@ -8,7 +8,7 @@ import {Trash} from "react-bootstrap-icons";
 import CartButton from "@/app/product/cartButton";
 import {useRouter} from "next/navigation";
 
-const AppURL = process.env.NEXT_PUBLIC_BASE_URL;
+const AppURL = process.env.API_BASE_URL;
 
 function ModalOrderConfirmed(props) {
     const router = useRouter();

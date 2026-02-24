@@ -15,7 +15,7 @@ export const metadata = {
     description: "prosadhoni ecommerce",
 };
 
-const AppURL = process.env.NEXT_PUBLIC_BASE_URL;
+const AppURL = process.env.API_BASE_URL;
 
 const getCategory = async () => {
     const url = AppURL + "category";

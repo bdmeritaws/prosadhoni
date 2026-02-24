@@ -7,7 +7,7 @@ import CartButton from "@/app/product/cartButton";
 import {deleteSingleProduct, modalCheckOrder} from "@/app/redux/product/productSlice";
 import {useRouter} from "next/navigation";
 
-const AppURL = process.env.NEXT_PUBLIC_BASE_URL;
+const AppURL = process.env.API_BASE_URL;
 
 function OrderConfirmed(props) {
     const router = useRouter();
