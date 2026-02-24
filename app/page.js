@@ -24,29 +24,8 @@ const getShopSlider = async () => {
     }
 }
 
-const getShopSlider1 = async () => {
-    const url = "https://admin.huzaiacademy.com/api/category";
-    const result = await fetch(url, {
-        method: "POST",
-        body: JSON.stringify({
-            ClientService: 'frontend-client',
-            AuthKey: 'Biddapit',
-            ContentType: 'application/json',
-        }),
-    });
-    if (result.status === 200) {
-        return result.json();
-    } else {
-        throw new Error("Enternal server error");
-    }
-}
-
 export default async function Home() {
     const response = await getShopSlider();
-    const response1 = await getShopSlider1();
-    console.log("response=====",response);
-    console.log("asdfsd=====",response1);
-
     return (
         <main>
             <SliderDetails images={response?.shop_slider}/>
