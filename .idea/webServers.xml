@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="ea71dae5-1be2-44d3-8184-f814bd4dde64" name="Prosadhoni Server">
+        <fileTransfer rootFolder="/var/www/prosadhoni.com/prosadhoni" accessType="SFTP" host="13.126.91.72" port="22" sshConfigId="2ec41dcd-7b45-42c1-aba4-44298bc5662f" sshConfig="ubuntu@13.126.91.72:22 key" keyPair="true">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>

@@ -1,0 +1,87 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+#outer > div {
+    -webkit-box-shadow: 0 4px 6px -6px #222;
+    -moz-box-shadow: 0 4px 6px -6px #222;
+    box-shadow: 0 4px 6px -7px #222;
+}
+
+@media (max-width: 576px) {
+    .display {
+        display: none;
+    }
+}
+
+@media (min-width: 577px) {
+    .md-display {
+        display: none;
+    }
+}
+
+.slider {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+}
+
+.slider-slides {
+    display: flex;
+    transition: transform 0.5s ease;
+}
+
+.slider-slide {
+    min-width: 100%;
+}
+
+.slider-btn-right {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    /*background-color: #a9a7a7;*/
+    color: white;
+    border: none;
+    cursor: pointer;
+    z-index: 1;
+    height: 50px;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    padding-right: 5px;
+}
+
+.slider-btn-left {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    /*background-color: #a9a7a7;*/
+    color: white;
+    border: none;
+    cursor: pointer;
+    z-index: 1;
+    height: 50px;
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+    padding-left: 5px;
+    margin-right: -1px;
+}
+
+.slider-btn-prev {
+    left: 0;
+}
+
+.slider-btn-next {
+    right: 1px;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-6px); }
+    40%, 80% { transform: translateX(6px); }
+}
+
+.animate-shake-loop {
+    animation: shake 0.6s ease-in-out infinite;
+    animation-delay: 3s;
+    animation-duration: 3s; /* 0.6s animation, 2.4s pause = 3s total cycle */
+}
