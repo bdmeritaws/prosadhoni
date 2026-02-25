@@ -1,12 +1,9 @@
 import React from 'react';
 import product from "@/app/product/product";
 import CartBody from "@/app/product/cartBody";
-import process from "next/dist/build/webpack/loaders/resolve-url-loader/lib/postcss";
-
-
-const AppURL = process.env.NEXT_PUBLIC_BASE_URL;
 
 const getProduct = async () => {
+    const AppURL = process.env.NEXT_PUBLIC_BASE_URL;
     const url = AppURL + "product";
     const result = await fetch(url, {
         next: {
