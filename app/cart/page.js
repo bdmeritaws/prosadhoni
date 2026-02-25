@@ -2,14 +2,13 @@
 import React, {useEffect, useState} from 'react';
 import {Trash} from 'react-bootstrap-icons';
 import {useDispatch, useSelector} from "react-redux";
-import process from "next/dist/build/webpack/loaders/resolve-url-loader/lib/postcss";
 import CartButton from "@/app/product/cartButton";
 import {deleteSingleProduct, modalCheckOrder} from "@/app/redux/product/productSlice";
 import {useRouter} from "next/navigation";
 
-const AppURL = process.env.NEXT_PUBLIC_BASE_URL;
 
 function OrderConfirmed(props) {
+    const AppURL = process.env.NEXT_PUBLIC_BASE_URL;
     const router = useRouter();
     const dispatch = useDispatch();
     const [successMsg, setSuccessMsg] = useState("");

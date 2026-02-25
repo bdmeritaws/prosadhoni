@@ -15,9 +15,9 @@ export const metadata = {
     description: "prosadhoni ecommerce",
 };
 
-const AppURL = process.env.NEXT_PUBLIC_BASE_URL;
 
 const getCategory = async () => {
+    const AppURL = process.env.NEXT_PUBLIC_BASE_URL;
     const url = AppURL + "category";
     const result = await fetch(url, {
         next: { revalidate: 1200 },

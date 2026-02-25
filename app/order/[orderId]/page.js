@@ -1,16 +1,14 @@
 "use client"
-import React, { useEffect, useState } from 'react';
-import process from "next/dist/build/webpack/loaders/resolve-url-loader/lib/postcss";
-import { modalCheckOrder } from "@/app/redux/product/productSlice";
-import { useDispatch } from "react-redux";
-import { useRouter } from "next/navigation";
-
-const AppURL = process.env.NEXT_PUBLIC_BASE_URL;
+import React, {useEffect, useState} from 'react';
+import {modalCheckOrder} from "@/app/redux/product/productSlice";
+import {useDispatch} from "react-redux";
+import {useRouter} from "next/navigation";
 
 
-function OrderDetails({ params }) {
+function OrderDetails({params}) {
+    const AppURL = process.env.NEXT_PUBLIC_BASE_URL;
     const router = useRouter();
-    const { orderId } = params;
+    const {orderId} = params;
     const [orderDetails, setOrderDetails] = useState();
     const [productDetails, setProductDetails] = useState([]);
     const dispatch = useDispatch();
@@ -97,45 +95,45 @@ function OrderDetails({ params }) {
                     <div className="overflow-x-auto border rounded-xl">
                         <table className="w-full text-sm">
                             <thead className="bg-[#8F2C8C] text-white">
-                                <tr>
-                                    <th className="text-left p-4">Product</th>
-                                    <th className="text-center p-4">Price</th>
-                                    <th className="text-center p-4">Quantity</th>
-                                    <th className="text-right p-4">Total</th>
-                                </tr>
+                            <tr>
+                                <th className="text-left p-4">Product</th>
+                                <th className="text-center p-4">Price</th>
+                                <th className="text-center p-4">Quantity</th>
+                                <th className="text-right p-4">Total</th>
+                            </tr>
                             </thead>
                             <tbody>
-                                {
-                                    productDetails?.map((v_cartProduct, index) => {
-                                        total += v_cartProduct?.qty * v_cartProduct?.price;
-                                        return (
-                                            <tr key={index}
-                                                className="border-b hover:bg-[#faf5fa] transition">
+                            {
+                                productDetails?.map((v_cartProduct, index) => {
+                                    total += v_cartProduct?.qty * v_cartProduct?.price;
+                                    return (
+                                        <tr key={index}
+                                            className="border-b hover:bg-[#faf5fa] transition">
 
-                                                <td className="p-4 flex items-center gap-4">
-                                                    <img
-                                                        src={v_cartProduct?.product_image}
-                                                        className="h-14 w-14 rounded-lg border object-cover"
-                                                    />
-                                                    <span className="font-medium">
+                                            <td className="p-4 flex items-center gap-4">
+                                                <img
+                                                    src={v_cartProduct?.product_image}
+                                                    className="h-14 w-14 rounded-lg border object-cover"
+                                                />
+                                                <span className="font-medium">
                                                         {v_cartProduct?.product_name}
                                                     </span>
-                                                </td>
+                                            </td>
 
-                                                <td className="text-center p-4">
-                                                    ৳ {v_cartProduct.price}
-                                                </td>
+                                            <td className="text-center p-4">
+                                                ৳ {v_cartProduct.price}
+                                            </td>
 
-                                                <td className="text-center p-4">
-                                                    {v_cartProduct.qty}
-                                                </td>
+                                            <td className="text-center p-4">
+                                                {v_cartProduct.qty}
+                                            </td>
 
-                                                <td className="text-right p-4 font-semibold text-[#8F2C8C]">
-                                                    ৳ {v_cartProduct.qty * v_cartProduct.price}
-                                                </td>
-                                            </tr>
-                                        );
-                                    })}
+                                            <td className="text-right p-4 font-semibold text-[#8F2C8C]">
+                                                ৳ {v_cartProduct.qty * v_cartProduct.price}
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
                             </tbody>
                         </table>
                     </div>

@@ -1,16 +1,15 @@
 "use client"
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from "react-redux";
-import { addToCart, deleteSingleProduct, modalCheck, modalCheckOrder, clearCart } from "@/app/redux/product/productSlice";
-import process from "next/dist/build/webpack/loaders/resolve-url-loader/lib/postcss";
-import AddToCart from "@/app/common/addToCart";
+import {deleteSingleProduct, modalCheckOrder, clearCart } from "@/app/redux/product/productSlice";
 import { Trash } from "react-bootstrap-icons";
 import CartButton from "@/app/product/cartButton";
 import { useRouter } from "next/navigation";
 
-const AppURL = process.env.NEXT_PUBLIC_BASE_URL;
+
 
 function ModalOrderConfirmed(props) {
+    const AppURL = process.env.NEXT_PUBLIC_BASE_URL;
     const router = useRouter();
     const dispatch = useDispatch();
     const checkModal = useSelector((state) => state.products.orderConfirmedModal);

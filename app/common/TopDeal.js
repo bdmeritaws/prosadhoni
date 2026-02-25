@@ -6,9 +6,8 @@ import AddToCart from "./addToCart";
 import Link from "next/link";
 import Loader from "@/app/product/loader";
 
-const AppURL = process.env.NEXT_PUBLIC_BASE_URL;
-
 export default function TopDeal() {
+  const AppURL = process.env.NEXT_PUBLIC_BASE_URL;
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 

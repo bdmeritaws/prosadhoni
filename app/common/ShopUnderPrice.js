@@ -4,12 +4,12 @@ import { useEffect, useState } from "react";
 import SectionHeader from "./SectionHeader";
 import AddToCart from "./addToCart";
 import Link from "next/link";
-import Image from "next/image";
 import { useDispatch, useSelector } from "react-redux";
 
-const AppURL = process.env.NEXT_PUBLIC_BASE_URL;
+
 
 export default function ShopUnderPrice() {
+  const AppURL = process.env.NEXT_PUBLIC_BASE_URL;
   const [products, setProducts] = useState([]);
   const dispatch = useDispatch();
   const cartProduct = useSelector((state) => state.products.productCart);

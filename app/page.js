@@ -1,19 +1,14 @@
-import Product from "@/app/product/product";
-import process from "next/dist/build/webpack/loaders/resolve-url-loader/lib/postcss";
-import SliderDetails from "@/app/page/sliderDetails";
-import ModalSideBar from "@/app/common/modalSideBar";
 import React from "react";
-import ModalOrderConfirmed from "@/app/common/modalOrderConfirmed";
 import ShopByCategory from "@/app/common/shopByCategory";
 import ShopByConcern from "@/app/common/shopByConcern";
-import TopBrand from "./common/TopBrand";
 import ShopUnderPrice from "./common/ShopUnderPrice";
- 
+
 import Features from "./common/Features";
 import TopDeal from "./common/TopDeal";
 
-const AppURL = process.env.NEXT_PUBLIC_BASE_URL;
+
 const getShopSlider = async () => {
+    const AppURL = process.env.NEXT_PUBLIC_BASE_URL;
     const url = AppURL + "shop_slider";
     const result = await fetch(url, {
         method: "POST",

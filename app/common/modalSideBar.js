@@ -2,13 +2,12 @@
 import React, {useEffect, useState} from 'react';
 import {Trash} from "react-bootstrap-icons";
 import CartButton from "@/app/product/cartButton";
-import {addToCart, deleteSingleProduct, modalCheck, modalCheckOrder} from "@/app/redux/product/productSlice";
+import {deleteSingleProduct, modalCheck, modalCheckOrder} from "@/app/redux/product/productSlice";
 import {useDispatch, useSelector} from "react-redux";
-import process from "next/dist/build/webpack/loaders/resolve-url-loader/lib/postcss";
 
-const AppURL = process.env.NEXT_PUBLIC_BASE_URL;
 
 function ModalSideBar(props) {
+    const AppURL = process.env.NEXT_PUBLIC_BASE_URL;
     const productId = "";
     const dispatch = useDispatch();
     const cartProduct = useSelector((state) => state.products.productCart);

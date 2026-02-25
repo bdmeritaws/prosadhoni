@@ -1,7 +1,6 @@
 "use client"
 import React, {useEffect, useState} from 'react';
 import Link from "next/link";
-import process from "next/dist/build/webpack/loaders/resolve-url-loader/lib/postcss";
 import Loader from "@/app/product/loader";
 import AddToCart from "@/app/common/addToCart";
 import {useDispatch, useSelector} from "react-redux";
@@ -11,9 +10,8 @@ import Image from "next/image";
 import {categorySlag} from "@/app/redux/product/productSlice";
 
 
-const AppURL = process.env.NEXT_PUBLIC_BASE_URL;
-
 function ProductCart(props) {
+    const AppURL = process.env.NEXT_PUBLIC_BASE_URL;
     const {type} = props;
     const dispatch = useDispatch();
     const path = usePathname();

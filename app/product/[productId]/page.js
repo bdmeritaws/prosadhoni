@@ -4,12 +4,19 @@ import CartBody from "@/app/product/cartBody";
 
 const getProduct = async () => {
     const AppURL = process.env.NEXT_PUBLIC_BASE_URL;
+
+    if (!AppURL) {
+        throw new Error("NEXT_PUBLIC_BASE_URL is not defined");
+    }
+
     const url = AppURL + "product";
+
     const result = await fetch(url, {
-        next: {
-            revalidate: 180
-        },
+        next: { revalidate: 180 },
         method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
         body: JSON.stringify({
             ClientService: 'frontend-client',
             AuthKey: 'Babshahi',
@@ -18,12 +25,13 @@ const getProduct = async () => {
             category_id: '',
         }),
     });
-    if (result.status === 200) {
-        return result.json();
-    } else {
-        throw new Error("Enternal server error");
+
+    if (!result.ok) {
+        throw new Error("Internal server error");
     }
-}
+
+    return result.json();
+};
 
 export default async function ProductDetails({params}) {
     const {productId} = params;
