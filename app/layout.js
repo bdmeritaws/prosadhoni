@@ -22,6 +22,12 @@ const getCategory = async () => {
     const result = await fetch(url, {
         next: { revalidate: 1200 },
         method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Origin": "https://babshahi.com",
+            "Referer": "https://babshahi.com",
+            "User-Agent": "Mozilla/5.0"
+        },
         body: JSON.stringify({
             ClientService: "frontend-client",
             AuthKey: "Babshahi",

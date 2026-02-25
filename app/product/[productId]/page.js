@@ -15,7 +15,10 @@ const getProduct = async () => {
         next: { revalidate: 180 },
         method: "POST",
         headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "Origin": "https://babshahi.com",
+            "Referer": "https://babshahi.com",
+            "User-Agent": "Mozilla/5.0"
         },
         body: JSON.stringify({
             ClientService: 'frontend-client',

@@ -12,6 +12,12 @@ const getShopSlider = async () => {
     const url = AppURL + "shop_slider";
     const result = await fetch(url, {
         method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Origin": "https://babshahi.com",
+            "Referer": "https://babshahi.com",
+            "User-Agent": "Mozilla/5.0"
+        },
         body: JSON.stringify({
             ClientService: 'frontend-client',
             AuthKey: 'Babshahi',
