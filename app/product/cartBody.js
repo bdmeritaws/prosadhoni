@@ -1,181 +1,310 @@
-"use client"
-import React, {useEffect, useState} from 'react';
-import {useDispatch, useSelector} from "react-redux";
-import {Telephone, Whatsapp, Messenger, Trash} from "react-bootstrap-icons";
+"use client";
+
+import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import Image from "next/image";
 import Loader from "@/app/product/loader";
-import ProductCart from "@/app/product/productCart";
-import process from "next/dist/build/webpack/loaders/resolve-url-loader/lib/postcss";
 import AddToCart from "@/app/common/addToCart";
+import ProductCart from "@/app/product/productCart";
+import { Messenger, Whatsapp, Telephone } from "react-bootstrap-icons";
 
-const AppURL = process.env.API_BASE_URL;
+const AppURL = process.env.NEXT_PUBLIC_BASE_URL;
 
-function CartBody(props) {
-    const dispatch = useDispatch();
-    const {productId} = props;
-    const [productDetails, setProductDetails] = useState([]);
-    const [product, setProduct] = useState([]);
-    const [isLoading, setIsLoading] = useState(false);
-    const cartProduct = useSelector((state) => state.products.productCart);
-    const category_slag = useSelector((state) => state?.products?.categorySlag);
-    const [details, setDetails] = useState(0);
+function CartBody({ productId }) {
+    const [zoomStyle, setZoomStyle] = useState({});
+    const [isZoomed, setIsZoomed] = useState(false);
+    const [showPreview, setShowPreview] = useState(false);
 
+
+    const [productDetails, setProductDetails] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [activeTab, setActiveTab] = useState("description");
+    const [deliveryCharge, setDeliveryCharge] = useState(0);
+
+    /* ================= FETCH PRODUCT ================= */
     useEffect(() => {
-        setIsLoading(true)
-        const static_Url = AppURL + "product";
-        fetch(static_Url, {
-            method: "POST", body: JSON.stringify({
-                ClientService: 'frontend-client',
-                AuthKey: 'Babshahi',
-                ContentType: 'application/json',
-                shop_name: 'prosadhoni',
-                category_id: '',
-            }),
-        }).then(response => {
-            response.json().then(res => {
-                setProduct(res.products);
-                const checkProduct = res.products?.find(findProductByProductId => findProductByProductId.slag_name === productId);
-                if (checkProduct !== undefined) {
-                    setProductDetails(checkProduct);
-                    setIsLoading(false);
+        const fetchProduct = async () => {
+            try {
+                const response = await fetch(AppURL + "product", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        ClientService: "frontend-client",
+                        AuthKey: "Babshahi",
+                        ContentType: "application/json",
+                        shop_name: "prosadhoni",
+                        category_id: "",
+                    }),
+                });
+
+                const res = await response.json();
+
+                const foundProduct = res.products?.find(
+                    (item) => item.slag_name === productId
+                );
+
+                if (foundProduct) {
+                    setProductDetails(foundProduct);
                 }
-            })
-        }).catch((error) => {
-            console.log(error);
-        });
-    }, []);
 
-    useEffect(() => {
-        setDetails(category_slag)
+                setIsLoading(false);
+            } catch (error) {
+                console.error(error);
+                setIsLoading(false);
+            }
+        };
+
+        fetchProduct();
         window.scrollTo(0, 0);
-    }, []);
+    }, [productId]);
 
+    if (isLoading) return <Loader />;
+
+    if (!productDetails) {
+        return (
+            <div className="text-center mt-20 text-red-600 text-xl">
+                Product Not Found
+            </div>
+        );
+    }
+
+    /* ================= CALCULATIONS ================= */
+    const discount =
+        productDetails.mrp_price && productDetails.sales_price
+            ? Math.round(
+                ((productDetails.mrp_price - productDetails.sales_price) /
+                    productDetails.mrp_price) *
+                100
+            )
+            : 0;
+
+    /* ================= SEO SCHEMA ================= */
     const schema = JSON.stringify({
         "@context": "https://schema.org/",
         "@type": "Product",
-        "name": productDetails?.product_name,
-        "image": productDetails?.product_image,
-        "description": productDetails?.description,
-        "brand": {
-            "@type": "Brand", "name": productDetails?.brand_name
+        name: productDetails.product_name,
+        image: productDetails.product_image,
+        description: productDetails.description,
+        brand: {
+            "@type": "Brand",
+            name: productDetails.brand_name,
         },
-        "sku": productDetails?.sku,
-        "offers": {
+        sku: productDetails.sku,
+        offers: {
             "@type": "Offer",
-            "url": AppURL + "product/" + productDetails?.slag_name,
-            "priceCurrency": "BDT",
-            "price": productDetails?.mrp_price,
-            "priceValidUntil": "2024-05-18",
-            "availability": "https://schema.org/InStock",
-            "itemCondition": "https://schema.org/NewCondition"
+            priceCurrency: "BDT",
+            price: productDetails.sales_price,
+            availability: "https://schema.org/InStock",
+            url: AppURL + "product/" + productDetails.slag_name,
         },
-        "aggregateRating": {
+        aggregateRating: {
             "@type": "AggregateRating",
-            "ratingValue": productDetails?.rating_value,
-            "bestRating": productDetails?.best_rating,
-            "worstRating": productDetails?.worst_rating,
-            "ratingCount": productDetails?.rating_count
-        }
+            ratingValue: productDetails.rating_value || 4,
+            reviewCount: productDetails.rating_count || 1,
+        },
     });
-    const [viewDescription, setViewDescription] = useState(false);
+
+    const handleMouseMove = (e) => {
+        const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
+
+        const x = ((e.clientX - left) / width) * 100;
+        const y = ((e.clientY - top) / height) * 100;
+
+        setZoomStyle({
+            transformOrigin: `${x}% ${y}%`,
+            transform: "scale(2)",
+        });
+    };
+
+
+
     return (
-        <div>
-            <div>
-                <script type="application/ld+json" dangerouslySetInnerHTML={{__html: schema}}/>
-                <div className="md:grid md:grid-cols-3 gap-4">
-                    <div>
-                        <img src={productDetails?.product_image} alt={`Slide ${productDetails?.product_name}`}/>
+        <div className="container mx-auto px-4 mt-10">
+
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: schema }}
+            />
+
+            {/* ================= TOP SECTION ================= */}
+            <div className="grid md:grid-cols-2 gap-10 bg-white p-6 rounded-lg shadow-sm">
+
+                {/* LEFT IMAGE */}
+                {/* LEFT IMAGE WITH ZOOM */}
+                <div
+                    className="border rounded-lg p-6 flex justify-center items-center overflow-hidden"
+                    onMouseEnter={() => setIsZoomed(true)}
+                    onMouseLeave={() => {
+                        setIsZoomed(false);
+                        setZoomStyle({ transform: "scale(1)" });
+                    }}
+                    onMouseMove={handleMouseMove}
+                >
+                    <img
+                        src={productDetails.product_image}
+                        alt={productDetails.product_name}
+                        className="object-contain max-h-[350px] transition-transform duration-200 ease-in-out"
+                        style={isZoomed ? zoomStyle : { transform: "scale(1)" }}
+                    />
+
+                    {/* FULLSCREEN IMAGE PREVIEW (Mobile Friendly) */}
+                    {showPreview && (
+                        <div
+                            className="fixed inset-0 bg-black bg-opacity-90 flex justify-center items-center z-50"
+                            onClick={() => setShowPreview(false)}
+                        >
+                            <img
+                                src={productDetails.product_image}
+                                alt="Preview"
+                                className="max-h-[90vh] max-w-[90vw] object-contain"
+                            />
+                        </div>
+                    )}
+
+                </div>
+
+
+                {/* RIGHT DETAILS */}
+                <div>
+                    <h1 className="text-2xl font-semibold text-gray-800">
+                        {productDetails.product_name}
+                    </h1>
+
+                    {/* Rating */}
+                    <div className="flex items-center mt-3 space-x-2">
+                        <div className="text-yellow-500 text-lg">★★★★☆</div>
+                        <span className="text-sm text-gray-500">
+                            ({productDetails.rating_count || 4} Ratings)
+                        </span>
                     </div>
-                    <div className="col-span-2 mx-5 mt-10 md:mt-0">
-                        <div className="font-bold text-lg">{productDetails?.product_name}</div>
-                        <div className="flex flex-row gap-x-10 mt-4">
-                            <div className="line-through font-bold text-xl">৳{productDetails?.mrp_price}</div>
-                            <div className="text-xl">৳{productDetails?.sales_price}</div>
-                        </div>
 
-                        <div className="md:w-80 w-[100%] mt-5 h-10 bg-amber-500 pl-8 rounded-md">
-                            <AddToCart productDetails={productDetails} buttonText="অর্ডার করুন"/>
-                        </div>
+                    {/* Price */}
+                    <div className="mt-4">
+                        <span className="text-3xl font-bold text-[#8F2C8C]">
+                            ৳ {productDetails.sales_price}
+                        </span>
 
-                        <div className="md:w-80 w-[100%] mt-5 h-10 bg-green-600 rounded-md">
-                            <AddToCart productDetails={productDetails} buttonText="কার্টে রাখুন"/>
+                        <span className="ml-3 text-lg line-through text-gray-400">
+                            ৳ {productDetails.mrp_price}
+                        </span>
+
+                        {discount > 0 && (
+                            <span className="ml-3 text-sm bg-red-100 text-red-600 px-2 py-1 rounded">
+                                {discount}% OFF
+                            </span>
+                        )}
+                    </div>
+
+                    {/* Buttons */}
+                    <div className="mt-6 space-y-3">
+                        <AddToCart
+                            productDetails={productDetails}
+                            buttonText="Add to Cart"
+                        />
+
+                        <AddToCart
+                            productDetails={productDetails}
+                            buttonText="Buy Now"
+                        />
+                    </div>
+
+                    {/* Delivery Selection */}
+                    <div className="mt-6 border rounded-md text-sm">
+                        <div
+                            onClick={() => setDeliveryCharge(60)}
+                            className={`flex justify-between p-2 cursor-pointer ${deliveryCharge === 60 ? "bg-purple-50" : ""
+                                }`}
+                        >
+                            <span>ঢাকার ভিতরে</span>
+                            <span>৳ 60</span>
                         </div>
 
                         <div
-                            className="text-white items-center md:w-80 w-[100%] px-2.5 py-2 bg-black text-white mt-5 text-center rounded-md">
-                            <div className="flex flex-row mx-auto w-48 gap-x-2">
-                                <Messenger size={18} color="blue" className="mt-1"/>
-                                <div>Chat With Us</div>
-                            </div>
+                            onClick={() => setDeliveryCharge(120)}
+                            className={`flex justify-between p-2 cursor-pointer ${deliveryCharge === 120 ? "bg-purple-50" : ""
+                                }`}
+                        >
+                            <span>ঢাকার বাহিরে</span>
+                            <span>৳ 120</span>
+                        </div>
+                    </div>
+
+                    {/* Contact Buttons */}
+                    <div className="mt-6 space-y-3">
+
+                        <div className="bg-black text-white rounded-md py-2 text-center flex justify-center gap-2 cursor-pointer">
+                            <Messenger size={18} color="blue" />
+                            Chat With Us
                         </div>
 
-                        <div
-                            className="text-white items-center md:w-80 w-[100%] px-2.5 py-2 mt-5 text-center rounded-md bg-black text-white">
-                            <div className="flex flex-row mx-auto w-48 gap-x-2">
-                                <Whatsapp size={18} color="green" className="mt-1"/>
-                                <div>WhatsApp Us</div>
-                            </div>
+                        <div className="bg-black text-white rounded-md py-2 text-center flex justify-center gap-2 cursor-pointer">
+                            <Whatsapp size={18} color="green" />
+                            WhatsApp Us
                         </div>
 
-                        <div
-                            className="text-white items-center md:w-80 w-[100%] px-2.5 bg-black text-white py-2 mt-5 text-center rounded-md">
-                            <div className="flex flex-row mx-auto w-48 gap-x-2">
-                                <Telephone size={18} color="blue" className="mt-1"/>
-                                <div>+8801816 668 833</div>
-                            </div>
+                        <div className="bg-black text-white rounded-md py-2 text-center flex justify-center gap-2">
+                            <Telephone size={18} color="blue" />
+                            +8801816 668 833
                         </div>
 
-                        <div className="mt-3 md:w-80 w-[100%]">
-                            <div className="border-b py-1.5 border-gray-300 border-t border-gray-300"
-                                 onClick={() => handelDeliveryCharge(60)}>
-                                <div className="justify-between flex flex-row">
-                                    <div>ঢাকার ভিতরে</div>
-                                    <div>৳ 60</div>
-                                </div>
-                            </div>
-                            <div className="border-b py-1.5 border-gray-300"
-                                 onClick={() => handelDeliveryCharge(120)}>
-                                <div className="justify-between flex flex-row">
-                                    <div> ঢাকার বাহিরে</div>
-                                    <div>৳ 120</div>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
-                <div className="my-10 mx-5">
-                    <div className="flex flex-row justify-between">
-                        <div>Product Details</div>
-                        <div className="cursor-pointer">
-                            {viewDescription ?
-                                <svg onClick={() => setViewDescription(false)} xmlns="http://www.w3.org/2000/svg"
-                                     width="16"
-                                     height="16" fill="currentColor"
-                                     className="bi bi-caret-up-fill" viewBox="0 0 16 16">
-                                    <path
-                                        d="m7.247 4.86-4.796 5.481c-.566.647-.106 1.659.753 1.659h9.592a1 1 0 0 0 .753-1.659l-4.796-5.48a1 1 0 0 0-1.506 0z"/>
-                                </svg>
-                                :
-                                <svg onClick={() => setViewDescription(true)} xmlns="http://www.w3.org/2000/svg"
-                                     width="16"
-                                     height="16" fill="currentColor"
-                                     className="bi bi-caret-down-fill" viewBox="0 0 16 16">
-                                    <path
-                                        d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
-                                </svg>
-                            }
-                        </div>
-                    </div>
-                    <div className="border-b border-gray-300 w-full"></div>
-                    {viewDescription ?
-                        <div className="border border-gray-300 p-3 rounded-md mt-2">
-                            {productDetails?.description}
-                        </div> : ""}
+            </div>
+
+            {/* ================= DELIVERY INFO ================= */}
+            <div className="grid md:grid-cols-4 grid-cols-2 gap-4 text-center mt-6 bg-gray-100 p-4 rounded-md text-sm">
+                <div>🔁 <strong>Return:</strong> 3 day</div>
+                <div>🔄 <strong>Exchange:</strong> 3 day</div>
+                <div>🚚 <strong>Delivery Time:</strong> 2 day</div>
+                <div>💵 <strong>Payment:</strong> COD Available</div>
+            </div>
+
+            {/* ================= TABS SECTION ================= */}
+            <div className="mt-8">
+
+                {/* Tabs */}
+                <div className="flex flex-wrap gap-3 justify-center mb-4">
+                    {[
+                        { key: "description", label: "Description" },
+                        { key: "reviews", label: "Reviews" },
+                        { key: "howto", label: "How To Use" },
+                        { key: "qa", label: "Q&A" },
+                    ].map((tab) => (
+                        <button
+                            key={tab.key}
+                            onClick={() => setActiveTab(tab.key)}
+                            className={`px-6 py-2 rounded-md text-sm font-medium transition-all
+                ${activeTab === tab.key
+                                    ? "bg-[#8F2C8C] text-white"
+                                    : "bg-gray-200 text-gray-700 border border-[#8F2C8C]"
+                                }`}
+                        >
+                            {tab.label}
+                        </button>
+                    ))}
                 </div>
+
+                {/* Content */}
+                <div className="bg-gray-50 border rounded-md p-6 text-gray-700 leading-relaxed">
+                    {activeTab === "description" && (
+                        <div>{productDetails.description}</div>
+                    )}
+                    {activeTab === "reviews" && <div>No reviews yet.</div>}
+                    {activeTab === "howto" && <div>Use daily for best results.</div>}
+                    {activeTab === "qa" && <div>No questions available.</div>}
+                </div>
+
             </div>
-            <div className="mx-4">
-                {isLoading ? <Loader/> : <ProductCart type={0}/>}
+
+            {/* ================= RELATED PRODUCTS ================= */}
+            <div className="mt-10">
+                <ProductCart type={0} />
             </div>
-        </div>);
+
+        </div>
+    );
 }
 
 export default CartBody;

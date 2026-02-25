@@ -11,7 +11,7 @@ import Image from "next/image";
 import {categorySlag} from "@/app/redux/product/productSlice";
 
 
-const AppURL = process.env.API_BASE_URL;
+const AppURL = process.env.NEXT_PUBLIC_BASE_URL;
 
 function ProductCart(props) {
     const {type} = props;
@@ -133,12 +133,12 @@ function ProductCart(props) {
                                             </Link>
                                         </div>
                                         <div className="flex flex-row md:space-x-2 space-x-1 h-6 px-2 md:mt-2 mt-4">
-                                            <p className="md:text-md text-sm pl-[30%] text-primary font-roboto md:font-semibold">৳{v_product?.mrp_price}
+                                            <p className="md:text-md text-sm pl-[30%] text-primary font-roboto md:font-semibold">৳{v_product?.sales_price}
                                             </p>
-                                            <p className="text-sm text-gray-400 font-roboto line-through">৳{v_product?.sales_price}</p>
+                                            <p className="text-sm text-gray-400 font-roboto line-through">৳{v_product?.mrp_price}</p>
                                         </div>
                                         <div className="p-2.5">
-                                            <AddToCart productDetails={v_product} buttonText="কার্টে রাখুন"/>
+                                            <AddToCart productDetails={v_product} buttonText="Add To Cart"/>
                                         </div>
                                     </div>
                                 </div>

@@ -1,152 +1,203 @@
-"use client"
-import React, {useEffect, useState} from 'react';
-import {Bag, Person, Search, X} from 'react-bootstrap-icons';
+"use client";
+
+import React, { useEffect, useState } from "react";
+import Image from "next/image";
+import { Bag, Person, Search } from "react-bootstrap-icons";
 import Link from "next/link";
-import {useDispatch, useSelector} from "react-redux";
-import {categorySlag, productName} from "@/app/redux/product/productSlice";
-import {usePathname, useRouter} from "next/navigation";
+import { useDispatch, useSelector } from "react-redux";
+import { categorySlag, productName } from "@/app/redux/product/productSlice";
+import { useRouter } from "next/navigation";
 
-
-function Menu({category}) {
+function Menu({ category }) {
     const router = useRouter();
-    const path = usePathname();
     const dispatch = useDispatch();
-    const [totalCart, setTotalCart] = useState(0);
+
     const cartProduct = useSelector((state) => state.products.productCart);
-    const categorySlug = useSelector((state) => state.products.categorySlag);
+    const [totalCart, setTotalCart] = useState(0);
+    const [search, setSearch] = useState("");
 
     useEffect(() => {
-        setTotalCart(cartProduct?.length);
+        setTotalCart(cartProduct?.length || 0);
     }, [cartProduct]);
-    const [isOpen, setIsOpen] = useState(false)
 
-    const handelMenu = (id) => {
-        dispatch(categorySlag(id));
-        if (id === 0) {
-            router.push(`/`);
-        } else {
-            router.push(`/search/${id}`);
-        }
-    }
-
-    const [searchBox, setSearchBox] = useState(false);
-    const [search, setSearch] = useState('');
-
-    const handleSearch = (value) => {
-        setSearch(value);
-        const len = value.trim().length;
-        if (len >= 3 && len % 3 === 0) {
-            dispatch(productName(value));
-            router.push(`/search/${value}`);
+    const handleSearch = () => {
+        if (search.trim().length >= 3) {
+            dispatch(productName(search));
+            router.push(`/search/${search}`);
         }
     };
 
-    const clearSearch = () => {
-        setSearch('');
-        router.push(`/`);
+    const handelMenu = (slug) => {
+        dispatch(categorySlag(slug));
+        router.push(slug === 0 ? "/" : `/search/${slug}`);
     };
-
-    useEffect(() => {
-        if (search === "") {
-            router.push(`/`);
-        }
-    }, [search]);
 
     return (
-        <div>
-            <header className="shadow-sm bg-pink-100 lg:bg-white border-b border-gray-200 sticky top-0 z-50">
-                <div className="bg-[#FC8934] h-16 text-white md:pt-5 pt-2 text-center">
-                    আমাদের যে কোনো পণ্য অর্ডার করতে কল বা WhatsApp করুন: 📞 01816-667755
+        <header className="sticky top-0 z-50">
+
+
+            {/* ================= MOBILE VIEW ================= */}
+            <div className="md:hidden">
+
+                {/* Top Bar */}
+                <div className="bg-[#8F2C8C] h-14 flex items-center justify-between px-4">
+                    <Link href="/" className="flex items-center gap-2">
+                        <Image
+                            src="/images/logo/logo-prosadhoni.webp"
+                            alt="Prosadhoni Logo"
+                            width={32}
+                            height={32}
+                            className="object-contain"
+                            priority
+                        />
+                        <span className="text-white text-lg font-semibold tracking-wide">
+                            Prosadhoni
+                        </span>
+                    </Link>
+
+                    <div className="flex items-center gap-4 text-white">
+                        <Link href="/account">
+                            <Person size={22} />
+                        </Link>
+
+                        <Link href="/cart" className="relative">
+                            <Bag size={22} />
+                            <span className="absolute -top-2 -right-2 bg-red-600 text-xs w-5 h-5 flex items-center justify-center rounded-full">
+                                {totalCart}
+                            </span>
+                        </Link>
+                    </div>
                 </div>
-                {searchBox ?
-                    <div className="md:container flex flex-row items-center justify-between md:mt-2 mt-0">
-                        <div className="relative w-full max-w-md mx-auto">
+
+                {/* Categories + Search */}
+                <div className="bg-white px-3 py-3 shadow-sm">
+                    <div className="flex items-center gap-2">
+
+                        {/* Categories Button */}
+                        <div className="relative w-[130px]">
+                            <div className="flex items-center justify-center gap-1 h-11 bg-gray-100 rounded-md text-sm font-medium text-gray-700">
+                                ☰ Categories
+                            </div>
+
+                            <select
+                                className="absolute inset-0 opacity-0 cursor-pointer"
+                                onChange={(e) => handelMenu(e.target.value)}
+                            >
+                                <option value="0">Categories</option>
+                                {category?.map((cat, i) => (
+                                    <option key={i} value={cat.category_slug}>
+                                        {cat.main_category_name}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        {/* Search Input */}
+                        <div className="flex flex-1 h-11 bg-gray-100 rounded-md overflow-hidden">
                             <input
                                 type="text"
-                                placeholder="Search Product"
                                 value={search}
-                                onChange={(e) => handleSearch(e.target.value)}
-                                className="h-10 w-full pl-2 pr-10 outline-1 rounded-md border border-gray-300"/>
+                                onChange={(e) => setSearch(e.target.value)}
+                                placeholder="Search products"
+                                className="flex-1 px-3 bg-transparent outline-none text-sm"
+                            />
+
                             <button
-                                onClick={clearSearch}
-                                className="absolute inset-y-0 right-2 flex items-center text-gray-500 hover:text-red-600">
-                                <X size={20} onClick={() => setSearchBox(false)}/>
+                                onClick={handleSearch}
+                                className="px-4 bg-[#6F1D6C] text-white flex items-center justify-center"
+                            >
+                                <Search size={16} />
                             </button>
                         </div>
-                    </div>
-                    :
-                    <div className="container flex flex-row items-center justify-between mt-2">
-                        <div className="text-[#FBCF71]">
-                            <button
-                                className="md:hidden focus:outline-none"
-                                onClick={() => setIsOpen(!isOpen)}>
-                                <svg className="w-6 h-6"
-                                     fill="none"
-                                     stroke="currentColor"
-                                     viewBox="0 0 24 24"
-                                     xmlns="http://www.w3.org/2000/svg">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                                          d="M4 6h16M4 12h16M4 18h16"/>
-                                </svg>
-                            </button>
-                            <div className="hidden md:block">
-                                <Search className="cursor-pointer" size={20} onClick={() => setSearchBox(true)}/>
-                            </div>
-                        </div>
-                        <div className="text-[#FBCF71]">
-                            <Link href="/">
-                                Prosadhoni
-                            </Link>
-                        </div>
-                        <div className="flex flex-row gap-x-2">
-                            <div className="block md:hidden">
-                                <Search className="text-[#FBCF71]" size={20} onClick={() => setSearchBox(true)}/>
-                            </div>
-                            <Link href="/cart"
-                                  className="text-center text-gray-700 hover:text-primary transition relative">
-                                <div
-                                    className="absolute -right-2 -top-1 w-4 h-4 bg-[#FBCF71] rounded-full flex items-center justify-center text-white text-xs">
-                                    {totalCart}
-                                </div>
-                                <div className="text-2xl text-[#FBCF71]">
-                                    <Bag size={20} className="mx-auto"/>
-                                </div>
-                            </Link>
-                            <Link href=""
-                                  className="text-[#FBCF71] text-center text-gray-700 hover:text-primary transition">
-                                <div className="text-2xl">
-                                    <Person size={23} className="mx-auto"/>
-                                </div>
-                            </Link>
-                        </div>
-                    </div>
-                }
-                <div className="bg-[#F3F3F3] h-12 pt-2 mt-5 hidden md:block">
-                    <div
-                        className="flex flex-row gap-x-[5%] cursor-pointer items-center justify-center mx-auto w-[80%]">
-                        <div onClick={() => handelMenu(0)}>All</div>
-                        {category?.map((v_category, index) => (
-                            <div onClick={() => handelMenu(v_category?.category_slug)}
-                                 className={categorySlug == v_category?.category_slug ? "bg-[#FC8934] p-1 rounded-md px-2 text-white" : ""}
-                                 style={{fontSize: 15}}
-                                 key={index}> {v_category?.main_category_name}
-                            </div>
-                        ))}
+
                     </div>
                 </div>
-                {isOpen && (
-                    <div className="mt-3 md:hidden space-y-2 cursor-pointer border-t border-green-50">
-                        <div className="w-full p-2 space-y-2">
-                            {category?.map((v_category, index) => (
-                                <div onClick={() => handelMenu(v_category?.category_slug)} className="h-6"
-                                     style={{fontSize: 15}}
-                                     key={index}>{v_category?.main_category_name}</div>
-                            ))}
+            </div>
+
+
+            {/* ================= DESKTOP VIEW ================= */}
+            <div className="hidden md:block bg-[#8F2C8C] shadow-md">
+                <div className="max-w-7xl mx-auto px-4">
+                    <div className="flex items-center justify-between h-[64px]">
+
+                        {/* Logo */}
+                        <Link href="/" className="flex items-center gap-3 group">
+                            <Image
+                                src="/images/logo/logo-prosadhoni.webp"
+                                alt="Prosadhoni Logo"
+                                width={40}
+                                height={40}
+                                className="object-contain transition-transform duration-300"
+                                priority
+                            />
+                            <span className="text-xl font-semibold tracking-wide text-white transition-all duration-300">
+                                Prosadhoni
+                            </span>
+                        </Link>
+
+                        {/* Search Area */}
+                        <div className="flex items-center bg-white rounded-md overflow-hidden w-[560px] h-[40px] shadow-sm">
+
+                            <div className="relative flex items-center gap-2 px-3 border-r text-gray-700 text-sm cursor-pointer">
+                                ☰ Categories
+                                <select
+                                    className="absolute inset-0 opacity-0 cursor-pointer"
+                                    onChange={(e) => handelMenu(e.target.value)}
+                                >
+                                    <option value="0">Categories</option>
+                                    {category?.map((cat, i) => (
+                                        <option key={i} value={cat.category_slug}>
+                                            {cat.main_category_name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            <input
+                                type="text"
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
+                                placeholder='Search for "beauty products"'
+                                className="flex-1 h-full px-3 text-sm text-gray-700 outline-none"
+                            />
+
+                            <button
+                                onClick={handleSearch}
+                                className="h-full px-4 bg-[#6F1D6C] text-white flex items-center gap-1 text-sm hover:bg-[#5a1557] transition"
+                            >
+                                <Search size={14} />
+                                Search
+                            </button>
+                        </div>
+
+                        {/* Right Buttons */}
+                        <div className="flex items-center gap-3">
+
+                            <Link
+                                href="/cart"
+                                className="relative flex items-center gap-2 bg-white text-[#8F2C8C] px-4 h-[36px] rounded-md text-sm font-medium hover:shadow-md transition"
+                            >
+                                <Bag size={16} />
+                                My Cart
+                                <span className="absolute -top-2 -right-2 bg-green-600 text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full">
+                                    {totalCart}
+                                </span>
+                            </Link>
+
+                            <Link
+                                href="/account"
+                                className="flex items-center gap-2 bg-white text-[#8F2C8C] px-4 h-[36px] rounded-md text-sm font-medium hover:shadow-md transition"
+                            >
+                                <Person size={16} />
+                                Account
+                            </Link>
+
                         </div>
                     </div>
-                )}
-            </header>
-        </div>
+                </div>
+            </div>
+
+        </header>
     );
 }
 

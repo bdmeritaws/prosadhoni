@@ -7,7 +7,7 @@ import CartButton from "@/app/product/cartButton";
 import {deleteSingleProduct, modalCheckOrder} from "@/app/redux/product/productSlice";
 import {useRouter} from "next/navigation";
 
-const AppURL = process.env.API_BASE_URL;
+const AppURL = process.env.NEXT_PUBLIC_BASE_URL;
 
 function OrderConfirmed(props) {
     const router = useRouter();
@@ -152,9 +152,9 @@ function OrderConfirmed(props) {
 
     return (
         <div className="container">
-            <div className="min-h-screen bg-white mt-5 border border-orange-500 rounded-md shadow-md">
+            <div className="min-h-screen bg-white mt-5 border border rounded-md shadow-md">
                 {/* Header */}
-                <div className="bg-orange-500 w-full text-white py-6 px-8 shadow">
+                <div className="bg-[#8F2C8C] w-full text-white py-6 px-8 shadow">
                     <h1 className="text-2xl font-bold">Shopping Cart</h1>
                     <div className="text-sm mt-1">
                         <span className="opacity-70">Home</span> &gt; <span>Your Shopping Cart</span>
@@ -227,7 +227,7 @@ function OrderConfirmed(props) {
                             {/*<p className="text-gray-500">Taxes and Shipping Calculated at Checkout</p>*/}
                             <button onClick={orderConfirmed}
                                     type="submit"
-                                    className="bg-orange-500 text-white rounded-sm border-0 shadow-md text-[14px] font-medium md:px-6 px-2 py-3 animate-shake-loop">
+                                    className="bg-[#8F2C8C] text-white rounded-sm border-0 shadow-md text-[14px] font-medium md:px-6 px-2 py-3 animate-shake-loop">
                                 🛒 ক্যাশ অন ডেলিভারিতে অর্ডার করুন
                             </button>
                         </div>

@@ -4,7 +4,7 @@ import CartBody from "@/app/product/cartBody";
 import process from "next/dist/build/webpack/loaders/resolve-url-loader/lib/postcss";
 
 
-const AppURL = process.env.API_BASE_URL;
+const AppURL = process.env.NEXT_PUBLIC_BASE_URL;
 
 const getProduct = async () => {
     const url = AppURL + "product";

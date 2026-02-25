@@ -63,7 +63,12 @@ const productSlice = createSlice({
         productName: (state, action) => {
             state.categorySlag = "";
             state.productName = action.payload;
-        }
+        },
+        // 🔥 ADD THIS
+    clearCart: (state) => {
+        state.productCart = [];
+        localStorage.removeItem("product");
+    }
     }
 });
 
@@ -75,6 +80,7 @@ export const {
     deleteSingleProduct,
     modalCheck,
     modalCheckOrder,
+    clearCart,
     categorySlag,
     productName
 } = productSlice.actions;

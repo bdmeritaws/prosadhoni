@@ -1,16 +1,16 @@
 "use client"
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import process from "next/dist/build/webpack/loaders/resolve-url-loader/lib/postcss";
-import {modalCheckOrder} from "@/app/redux/product/productSlice";
-import {useDispatch} from "react-redux";
-import {useRouter} from "next/navigation";
+import { modalCheckOrder } from "@/app/redux/product/productSlice";
+import { useDispatch } from "react-redux";
+import { useRouter } from "next/navigation";
 
-const AppURL = process.env.API_BASE_URL;
+const AppURL = process.env.NEXT_PUBLIC_BASE_URL;
 
 
-function OrderDetails({params}) {
+function OrderDetails({ params }) {
     const router = useRouter();
-    const {orderId} = params;
+    const { orderId } = params;
     const [orderDetails, setOrderDetails] = useState();
     const [productDetails, setProductDetails] = useState([]);
     const dispatch = useDispatch();
@@ -50,113 +50,133 @@ function OrderDetails({params}) {
 
     var total = 0;
     return (
-        <div className="container">
-            <div className="bg-white">
-                <div className="h-10"></div>
-                <div className="text-green-500 text-xl text-center">THANKS FOR YOUR ORDER</div>
-                <div className="ml-10 mt-5">
-                    <div className="space-y-2">
-                        <div className="text-xl font-bold">আপনার অর্ডারটি সফলভাবে সম্পন্ন হয়েছে, আমাদের কল
-                            সেন্টার থেকে ফোন করে আপনার অর্ডারটি কনফার্ম করা হবে
-                        </div>
+        <div className="min-h-screen bg-gray-50 py-10">
+            <div className="max-w-5xl mx-auto bg-white shadow-xl rounded-2xl p-8">
+
+                {/* Success Header */}
+                <div className="text-center space-y-3">
+                    <div className="text-2xl font-bold text-[#8F2C8C]">
+                        THANKS FOR YOUR ORDER
                     </div>
 
-                    <div className="mt-8 space-y-2">
-                        <div className="flex flex-row gap-x-2">
-                            <div className="h-2 bg-green-600 w-2 rounded-full mt-2.5"></div>
-                            <div className="text-xl font-bold">Order Number: {orderId}</div>
-                        </div>
-                        <div className="flex flex-row gap-x-2">
-                            <div className="h-2 bg-green-600 w-2 rounded-full mt-2.5"></div>
-                            <div className="text-xl font-bold">Payment Method: Cash on Delivery</div>
-                        </div>
+                    <div className="text-lg font-semibold text-gray-700">
+                        আপনার অর্ডারটি সফলভাবে সম্পন্ন হয়েছে, আমাদের কল
+                        সেন্টার থেকে ফোন করে আপনার অর্ডারটি কনফার্ম করা হবে
+                    </div>
+                </div>
+
+                {/* Order Info */}
+                <div className="mt-10 space-y-4 border-t pt-6">
+                    <div className="flex items-center gap-3 text-lg font-semibold">
+                        <div className="h-3 w-3 bg-[#8F2C8C] rounded-full"></div>
+                        Order Number: {orderId}
                     </div>
 
-                    <div className="mt-10">
-                        <div className="text-xl font-bold">বিশেষ দ্রষ্টব্যঃ ডেলিভারি ম্যান সামনে থাকা অবস্থায়
-                            প্রোডাক্ট
-                            চেক করে নিবেন।
-                        </div>
-                        <div className="text-xl font-bold">ডেলিভারি ম্যান চলে আসার পর কোন অভিযোগ গ্রহণযোগ্য নয়!
-                        </div>
+                    <div className="flex items-center gap-3 text-lg font-semibold">
+                        <div className="h-3 w-3 bg-[#8F2C8C] rounded-full"></div>
+                        Payment Method: Cash on Delivery
+                    </div>
+                </div>
+
+                {/* Notice */}
+                <div className="mt-10 bg-[#faf5fa] border border-[#8F2C8C] rounded-xl p-6 space-y-2">
+                    <div className="font-semibold text-gray-800">
+                        বিশেষ দ্রষ্টব্যঃ ডেলিভারি ম্যান সামনে থাকা অবস্থায় প্রোডাক্ট চেক করে নিবেন।
+                    </div>
+                    <div className="font-semibold text-gray-800">
+                        ডেলিভারি ম্যান চলে আসার পর কোন অভিযোগ গ্রহণযোগ্য নয়!
+                    </div>
+                </div>
+
+                {/* Order Details */}
+                <div className="mt-12">
+                    <div className="text-xl font-bold text-[#8F2C8C] mb-6">
+                        Order Details
                     </div>
 
-                    {/*12623*/}
+                    <div className="overflow-x-auto border rounded-xl">
+                        <table className="w-full text-sm">
+                            <thead className="bg-[#8F2C8C] text-white">
+                                <tr>
+                                    <th className="text-left p-4">Product</th>
+                                    <th className="text-center p-4">Price</th>
+                                    <th className="text-center p-4">Quantity</th>
+                                    <th className="text-right p-4">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {
+                                    productDetails?.map((v_cartProduct, index) => {
+                                        total += v_cartProduct?.qty * v_cartProduct?.price;
+                                        return (
+                                            <tr key={index}
+                                                className="border-b hover:bg-[#faf5fa] transition">
 
-                    <div>
-                        <div className="text-xl font-bold mt-10">Order Datails</div>
-                        <div className="mt-10 md:mt-0 md:w-[95%] p-2 md:text-lg text-sm">
-                            <div className="font-bold text-xl">আপনার অর্ডার</div>
+                                                <td className="p-4 flex items-center gap-4">
+                                                    <img
+                                                        src={v_cartProduct?.product_image}
+                                                        className="h-14 w-14 rounded-lg border object-cover"
+                                                    />
+                                                    <span className="font-medium">
+                                                        {v_cartProduct?.product_name}
+                                                    </span>
+                                                </td>
 
-                            <div className="grid grid-cols-8 border-t border-b border-gray-300 space-y-2">
-                                <div className="col-span-4 text-left">Product Name</div>
-                                <div className="text-center">Price</div>
-                                <div className="text-right col-span-2">Quantity</div>
-                                <div className="text-right">Total</div>
-                            </div>
+                                                <td className="text-center p-4">
+                                                    ৳ {v_cartProduct.price}
+                                                </td>
 
-                            {
-                                productDetails?.map((v_cartProduct, index) => {
-                                    total += v_cartProduct?.qty * v_cartProduct?.price;
-                                    return (
-                                        <div key={index}
-                                             className="grid grid-cols-8 border-b border-gray-300 space-y-2">
-                                            <div
-                                                className="col-span-4 text-left flex flex-row">
-                                                <div className="w-14 h-12">
-                                                    <img src={v_cartProduct?.product_image}
-                                                         className="h-12 w-14 p-1 rounded-md"/>
-                                                </div>
-                                                <div className="vertical-align: middle pl-5">
-                                                    {v_cartProduct?.product_name}
-                                                </div>
-                                            </div>
-                                            <div className="text-center pb-1.5">{v_cartProduct.price}</div>
-                                            <div className="text-center col-span-2 pl-[66%]">{v_cartProduct.qty}</div>
-                                            <div className="text-right">
-                                                {v_cartProduct.qty * v_cartProduct.price}
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-                            <div className="grid grid-cols-8 border-b border-gray-300 my-3">
-                                <div className="col-span-7 text-right">Sub Total</div>
-                                <div className="text-center col-span-1 text-right">৳{total}</div>
-                            </div>
+                                                <td className="text-center p-4">
+                                                    {v_cartProduct.qty}
+                                                </td>
 
-                            <div className="grid grid-cols-8 border-b border-gray-300 my-3">
-                                <div className="col-span-7 text-right">
-                                    (
-                                    {(orderDetails?.amount_to_collect - total) === 60 ?
-                                        "ঢাকার ভিতরে ডেলিভারি চার্জ" :
-                                        "ঢাকার বাহিরে ডেলিভারি চার্জ"
-                                    })
-                                </div>
-                                <div
-                                    className="text-center col-span-1 text-right">
-                                    ৳ {orderDetails?.amount_to_collect - total}.00
-                                </div>
-                            </div>
-                            <div className="grid grid-cols-8 border-b border-gray-300 my-3">
-                                <div className="col-span-7 text-right">Total</div>
-                                <div className="text-center col-span-1 text-right">৳ {orderDetails?.amount_to_collect}.00
-                                </div>
-                            </div>
-                        </div>
+                                                <td className="text-right p-4 font-semibold text-[#8F2C8C]">
+                                                    ৳ {v_cartProduct.qty * v_cartProduct.price}
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
+                            </tbody>
+                        </table>
                     </div>
-                    <div className="flex flex-row flex-1 gap-x-5">
 
-                        <div onClick={handelContinue}
-                             className="bg-green-600 p-2 text-white cursor-pointer rounded-md">Shopping
-                            continue..
+                    {/* Summary */}
+                    <div className="mt-8 bg-gray-50 border rounded-xl p-6 space-y-3 text-sm">
+                        <div className="flex justify-between">
+                            <span>Sub Total</span>
+                            <span className="font-medium">৳ {total}</span>
                         </div>
 
+                        <div className="flex justify-between">
+                            <span>
+                                {(orderDetails?.amount_to_collect - total) === 60 ?
+                                    "ঢাকার ভিতরে ডেলিভারি চার্জ" :
+                                    "ঢাকার বাহিরে ডেলিভারি চার্জ"}
+                            </span>
+                            <span className="font-medium">
+                                ৳ {orderDetails?.amount_to_collect - total}.00
+                            </span>
+                        </div>
+
+                        <div className="flex justify-between border-t pt-4 font-bold text-base text-[#8F2C8C]">
+                            <span>Total</span>
+                            <span>৳ {orderDetails?.amount_to_collect}.00</span>
+                        </div>
                     </div>
-                    <div className="h-10"></div>
+                </div>
+
+                {/* Continue Button */}
+                <div className="mt-10 text-center">
+                    <button
+                        onClick={handelContinue}
+                        className="bg-[#8F2C8C] hover:bg-[#6F1D6C] text-white px-8 py-3 rounded-xl font-semibold shadow-md transition">
+                        Continue Shopping
+                    </button>
                 </div>
             </div>
         </div>
     );
+
 }
 
 export default OrderDetails;

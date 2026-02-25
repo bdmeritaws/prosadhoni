@@ -4,8 +4,15 @@ import SliderDetails from "@/app/page/sliderDetails";
 import ModalSideBar from "@/app/common/modalSideBar";
 import React from "react";
 import ModalOrderConfirmed from "@/app/common/modalOrderConfirmed";
+import ShopByCategory from "@/app/common/shopByCategory";
+import ShopByConcern from "@/app/common/shopByConcern";
+import TopBrand from "./common/TopBrand";
+import ShopUnderPrice from "./common/ShopUnderPrice";
+ 
+import Features from "./common/Features";
+import TopDeal from "./common/TopDeal";
 
-const AppURL = process.env.API_BASE_URL;
+const AppURL = process.env.NEXT_PUBLIC_BASE_URL;
 const getShopSlider = async () => {
     const url = AppURL + "shop_slider";
     const result = await fetch(url, {
@@ -24,12 +31,39 @@ const getShopSlider = async () => {
     }
 }
 
+const getShopSlider1 = async () => {
+    const url = "https://admin.huzaiacademy.com/api/category";
+    const result = await fetch(url, {
+        method: "POST",
+        body: JSON.stringify({
+            ClientService: 'frontend-client',
+            AuthKey: 'Biddapit',
+            ContentType: 'application/json',
+        }),
+    });
+    if (result.status === 200) {
+        return result.json();
+    } else {
+        throw new Error("Enternal server error");
+    }
+}
+
 export default async function Home() {
     const response = await getShopSlider();
+    // const response1 = await getShopSlider1();
+    // console.log("response=====",response);
+    // console.log("asdfsd=====",response1);
+
     return (
         <main>
-            <SliderDetails images={response?.shop_slider}/>
-            <Product/>
+            {/* <SliderDetails images={response?.shop_slider}/> */}
+            <ShopByCategory/>
+            <ShopByConcern/>
+            {/* <TopBrand/> */}
+            <ShopUnderPrice/>
+            <TopDeal/>
+            <Features/>
+            {/* <Product/> */}
         </main>
     );
 }
