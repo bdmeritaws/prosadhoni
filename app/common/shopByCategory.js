@@ -9,49 +9,57 @@ const categories = [
   {
     id: 1,
     name: "Skincare",
-    image: "/images/shopbycategory/skincare.webp",
+    image:
+      "https://babshahi.s3.ap-south-1.amazonaws.com/category/skincare.webp",
     slug: "Skin",
   },
   {
     id: 2,
     name: "Haircare",
-    image: "/images/shopbycategory/haircare.webp",
+    image:
+      "https://babshahi.s3.ap-south-1.amazonaws.com/category/haircare.webp",
     slug: "Hair",
   },
   {
     id: 3,
     name: "Personal Care",
-    image: "/images/shopbycategory/personal-care.webp",
+    image:
+      "https://babshahi.s3.ap-south-1.amazonaws.com/category/personal-care.webp",
     slug: "Personal Care",
   },
   {
     id: 4,
     name: "Men's Grooming",
-    image: "/images/shopbycategory/men’s-grooming.webp",
+    image:
+      "https://babshahi.s3.ap-south-1.amazonaws.com/category/men’s-grooming.webp",
     slug: "mens-grooming",
   },
   {
     id: 5,
     name: "Fragrance & Perfume",
-    image: "/images/shopbycategory/fragrance-&-perfume.webp",
+    image:
+      "https://babshahi.s3.ap-south-1.amazonaws.com/category/fragrance-&-perfume.webp",
     slug: "fragrance-perfume",
   },
   {
     id: 6,
     name: "Makeup",
-    image: "/images/shopbycategory/makeup.webp",
+    image:
+      "https://babshahi.s3.ap-south-1.amazonaws.com/category/makeup.webp",
     slug: "makeup",
   },
   {
     id: 7,
     name: "Organic Beauty",
-    image: "/images/shopbycategory/organic-beauty.webp",
+    image:
+      "https://babshahi.s3.ap-south-1.amazonaws.com/category/organic-beauty.webp",
     slug: "organic-beauty",
   },
   {
     id: 8,
     name: "Beauty Tools & Device",
-    image: "/images/shopbycategory/beauty-tools-&-device.webp",
+    image:
+      "https://babshahi.s3.ap-south-1.amazonaws.com/category/beauty-tools-&-device.webp",
     slug: "beauty-tools-device",
   },
 ];
