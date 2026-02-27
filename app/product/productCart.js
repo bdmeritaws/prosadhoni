@@ -1,18 +1,18 @@
 "use client"
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from "next/link";
 import Loader from "@/app/product/loader";
 import AddToCart from "@/app/common/addToCart";
-import {useDispatch, useSelector} from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import noResultFound from '../../public/No-Result-Found.jpg';
-import {usePathname} from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import Image from "next/image";
-import {categorySlag} from "@/app/redux/product/productSlice";
+import { categorySlag } from "@/app/redux/product/productSlice";
 
 
 function ProductCart(props) {
     const AppURL = process.env.NEXT_PUBLIC_BASE_URL;
-    const {type} = props;
+    const { type } = props;
     const dispatch = useDispatch();
     const path = usePathname();
     const [currentPage, setCurrentPage] = useState(1);
@@ -30,6 +30,12 @@ function ProductCart(props) {
         const static_Url = AppURL + "product";
         fetch(static_Url, {
             method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Origin": "https://babshahi.com",
+                "Referer": "https://babshahi.com",
+                "User-Agent": "Mozilla/5.0"
+            },
             body: JSON.stringify({
                 ClientService: 'frontend-client',
                 AuthKey: 'Babshahi',
@@ -106,20 +112,20 @@ function ProductCart(props) {
     return (
         <div>
             {isLoading ?
-                <Loader/>
+                <Loader />
                 :
                 <div>
                     {currentItems?.length > 0 ?
                         <div className="grid lg:grid-cols-5 grid-cols-2 md:gap-4 gap-2.5">
                             {currentItems?.map((v_product, index) => (
                                 <div key={index}
-                                     className="group rounded-md bg-white h-auto border border-gray-300 overflow-hidden">
+                                    className="group rounded-md bg-white h-auto border border-gray-300 overflow-hidden">
                                     <div
                                         className="relative h-min w-full overflow-hidden inline-block">
                                         <Link href={`/product/${v_product.slag_name}`}>
                                             <img
                                                 src={v_product?.product_image}
-                                                className="hover:scale-125 duration-500 mx-auto rounded-md mt-2 transform transition cursor-pointer md:w-[200px] md:h-[200px] w-[120px] h-[120px]"/>
+                                                className="hover:scale-125 duration-500 mx-auto rounded-md mt-2 transform transition cursor-pointer md:w-[200px] md:h-[200px] w-[120px] h-[120px]" />
                                         </Link>
                                     </div>
                                     <div className="md:pt-4 pt-2">
@@ -136,7 +142,7 @@ function ProductCart(props) {
                                             <p className="text-sm text-gray-400 font-roboto line-through">৳{v_product?.mrp_price}</p>
                                         </div>
                                         <div className="p-2.5">
-                                            <AddToCart productDetails={v_product} buttonText="Add To Cart"/>
+                                            <AddToCart productDetails={v_product} buttonText="Add To Cart" />
                                         </div>
                                     </div>
                                 </div>
@@ -148,7 +154,7 @@ function ProductCart(props) {
                                     <div className="text-center font-bold text-red-600 text-2xl">No result found</div>
                                     <div className="text-center">Please search again ...</div>
                                     <Image src={noResultFound} alt="offer Image"
-                                           className="h-[60%] w-[60%] mx-auto mt-10 rounded-md"/>
+                                        className="h-[60%] w-[60%] mx-auto mt-10 rounded-md" />
                                 </div>
                             }
                         </div>
@@ -182,9 +188,8 @@ function ProductCart(props) {
                             <button
                                 key={num}
                                 onClick={() => setCurrentPage(num)}
-                                className={`px-3 py-1 rounded ${
-                                    currentPage === num ? 'bg-blue-500 text-white' : 'bg-gray-100'
-                                }`}>
+                                className={`px-3 py-1 rounded ${currentPage === num ? 'bg-blue-500 text-white' : 'bg-gray-100'
+                                    }`}>
                                 {num}
                             </button>
                         ));
