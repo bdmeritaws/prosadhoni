@@ -31,4 +31,4 @@ jobs:
             echo "Reloading PM2..."
             pm2 reload prosadhoni || pm2 start npm --name "prosadhoni" -- start
 
-            echo "Deployment complete!"
+            echo "Deployment successfully complete!"
