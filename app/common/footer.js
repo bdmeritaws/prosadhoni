@@ -6,8 +6,6 @@ function Footer() {
   return (
     <footer className="bg-gradient-to-r from-[#2b2f33] to-[#1f2327] text-gray-300 py-12 px-6 md:px-16 mt-4">
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-10">
-
-        {/* Logo & Contact */}
         <div>
           <div className="flex items-center gap-2 mb-4">
             <Image
@@ -20,7 +18,6 @@ function Footer() {
               Prosadhoni
             </h2>
           </div>
-
           <div className="space-y-2 text-sm">
             <p className="flex items-center gap-2">
               <span className="text-green-400">📞</span> 01727123480
