@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Loader from "@/app/product/loader";
 import AddToCart from "@/app/common/addToCart";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import noResultFound from "../../public/No-Result-Found.jpg";
 import Image from "next/image";
 
@@ -17,13 +17,13 @@ function ProductCart({ type }) {
   const [products, setProducts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   const itemsPerPage = 15;
 
-  /* ---------------- API FUNCTION ---------------- */
+  /* ---------------- FETCH FUNCTION ---------------- */
 
-  const fetchProducts = async () => {
+  const fetchProducts = async (page = 1) => {
     try {
       setIsLoading(true);
 
@@ -33,18 +33,19 @@ function ProductCart({ type }) {
         AuthKey: "Babshahi",
         ContentType: "application/json",
         shop_name: "prosadhoni",
-        page: currentPage,
+        page: page,
         limit: itemsPerPage,
       };
 
-      if (productName !== "") {
+      if (productName && productName !== "") {
         url = AppURL + "product_by_name";
         bodyData.product_name = productName;
       } else {
         url = AppURL + "product";
-        bodyData.category_id =
-          categoryId !== "" ? categoryId : 0;
+        bodyData.category_id = categoryId ? categoryId : 0;
       }
+
+      console.log("Sending API:", bodyData); // DEBUG
 
       const response = await fetch(url, {
         method: "POST",
@@ -52,13 +53,15 @@ function ProductCart({ type }) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(bodyData),
+        cache: "no-store", // important for production
       });
 
       const res = await response.json();
 
+      console.log("API Response:", res); // DEBUG
+
       setProducts(res?.products || []);
 
-      // backend যদি total দেয়
       if (res?.total) {
         setTotalPages(Math.ceil(res.total / itemsPerPage));
       } else {
@@ -72,16 +75,16 @@ function ProductCart({ type }) {
     }
   };
 
-  /* ---------------- PAGE RESET WHEN FILTER CHANGE ---------------- */
+  /* ---------------- RESET PAGE WHEN FILTER CHANGE ---------------- */
 
   useEffect(() => {
     setCurrentPage(1);
   }, [categoryId, productName]);
 
-  /* ---------------- MAIN EFFECT ---------------- */
+  /* ---------------- MAIN FETCH ---------------- */
 
   useEffect(() => {
-    fetchProducts();
+    fetchProducts(currentPage);
   }, [categoryId, productName, currentPage]);
 
   /* ---------------- UI ---------------- */
@@ -101,8 +104,8 @@ function ProductCart({ type }) {
                 <Link href={`/product/${v_product.slag_name}`}>
                   <img
                     src={v_product?.product_image}
-                    className="hover:scale-110 duration-500 mx-auto mt-2 rounded-md cursor-pointer md:w-[200px] md:h-[200px] w-[120px] h-[120px]"
                     alt={v_product?.product_name}
+                    className="hover:scale-110 duration-500 mx-auto mt-2 rounded-md cursor-pointer md:w-[200px] md:h-[200px] w-[120px] h-[120px]"
                   />
                 </Link>
               </div>
