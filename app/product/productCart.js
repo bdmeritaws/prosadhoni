@@ -7,23 +7,21 @@ import AddToCart from "@/app/common/addToCart";
 import { useDispatch, useSelector } from "react-redux";
 import noResultFound from "../../public/No-Result-Found.jpg";
 import Image from "next/image";
-import { categorySlag } from "@/app/redux/product/productSlice";
 
-function ProductCart(props) {
+function ProductCart({ type }) {
   const AppURL = process.env.NEXT_PUBLIC_BASE_URL;
-  const { type } = props;
-  const dispatch = useDispatch();
-
-  const [currentPage, setCurrentPage] = useState(1);
-  const [products, setProducts] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  const itemsPerPage = 15;
 
   const categoryId = useSelector((state) => state.products.categorySlag);
   const productName = useSelector((state) => state.products.productName);
 
-  /* ---------------- API CALL FUNCTION ---------------- */
+  const [products, setProducts] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const itemsPerPage = 15;
+
+  /* ---------------- API FUNCTION ---------------- */
 
   const fetchProducts = async () => {
     try {
@@ -44,7 +42,8 @@ function ProductCart(props) {
         bodyData.product_name = productName;
       } else {
         url = AppURL + "product";
-        bodyData.category_id = categoryId !== "" ? categoryId : 0;
+        bodyData.category_id =
+          categoryId !== "" ? categoryId : 0;
       }
 
       const response = await fetch(url, {
@@ -58,6 +57,14 @@ function ProductCart(props) {
       const res = await response.json();
 
       setProducts(res?.products || []);
+
+      // backend যদি total দেয়
+      if (res?.total) {
+        setTotalPages(Math.ceil(res.total / itemsPerPage));
+      } else {
+        setTotalPages(1);
+      }
+
       setIsLoading(false);
     } catch (error) {
       console.log("API Error:", error);
@@ -65,94 +72,91 @@ function ProductCart(props) {
     }
   };
 
-  /* ---------------- SINGLE USE EFFECT ---------------- */
+  /* ---------------- PAGE RESET WHEN FILTER CHANGE ---------------- */
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [categoryId, productName]);
+
+  /* ---------------- MAIN EFFECT ---------------- */
 
   useEffect(() => {
     fetchProducts();
   }, [categoryId, productName, currentPage]);
 
-  /* ---------------- PAGINATION ---------------- */
-
-  const totalPages = Math.ceil(products.length / itemsPerPage);
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = products.slice(indexOfFirstItem, indexOfLastItem);
-
-  /* ---------------- RENDER ---------------- */
+  /* ---------------- UI ---------------- */
 
   return (
     <div>
       {isLoading ? (
         <Loader />
-      ) : (
-        <div>
-          {currentItems?.length > 0 ? (
-            <div className="grid lg:grid-cols-5 grid-cols-2 md:gap-4 gap-2.5">
-              {currentItems.map((v_product, index) => (
-                <div
-                  key={index}
-                  className="group rounded-md bg-white border border-gray-300 overflow-hidden"
-                >
-                  <div className="relative w-full overflow-hidden">
-                    <Link href={`/product/${v_product.slag_name}`}>
-                      <img
-                        src={v_product?.product_image}
-                        className="hover:scale-110 duration-500 mx-auto mt-2 rounded-md cursor-pointer md:w-[200px] md:h-[200px] w-[120px] h-[120px]"
-                        alt={v_product?.product_name}
-                      />
-                    </Link>
-                  </div>
-
-                  <div className="md:pt-4 pt-2">
-                    <div className="md:h-12 h-14 w-[99%] mx-auto text-center mt-1">
-                      <Link href={`/product/${v_product.slag_name}`}>
-                        <h4 className="text-gray-800 text-sm hover:text-primary transition">
-                          {v_product?.product_name}
-                        </h4>
-                      </Link>
-                    </div>
-
-                    <div className="flex justify-center space-x-2 h-6 px-2 md:mt-2 mt-4">
-                      <p className="md:text-md text-sm text-primary font-semibold">
-                        ৳{v_product?.sales_price}
-                      </p>
-                      <p className="text-sm text-gray-400 line-through">
-                        ৳{v_product?.mrp_price}
-                      </p>
-                    </div>
-
-                    <div className="p-2.5">
-                      <AddToCart
-                        productDetails={v_product}
-                        buttonText="Add To Cart"
-                      />
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center">
-              <div className="font-bold text-red-600 text-2xl">
-                No result found
+      ) : products.length > 0 ? (
+        <div className="grid lg:grid-cols-5 grid-cols-2 md:gap-4 gap-2.5">
+          {products.map((v_product, index) => (
+            <div
+              key={index}
+              className="group rounded-md bg-white border border-gray-300 overflow-hidden"
+            >
+              <div className="relative w-full overflow-hidden">
+                <Link href={`/product/${v_product.slag_name}`}>
+                  <img
+                    src={v_product?.product_image}
+                    className="hover:scale-110 duration-500 mx-auto mt-2 rounded-md cursor-pointer md:w-[200px] md:h-[200px] w-[120px] h-[120px]"
+                    alt={v_product?.product_name}
+                  />
+                </Link>
               </div>
-              <div>Please search again ...</div>
-              <Image
-                src={noResultFound}
-                alt="No Result"
-                className="h-[60%] w-[60%] mx-auto mt-10 rounded-md"
-              />
+
+              <div className="md:pt-4 pt-2">
+                <div className="md:h-12 h-14 w-[99%] mx-auto text-center mt-1">
+                  <Link href={`/product/${v_product.slag_name}`}>
+                    <h4 className="text-gray-800 text-sm hover:text-primary transition">
+                      {v_product?.product_name}
+                    </h4>
+                  </Link>
+                </div>
+
+                <div className="flex justify-center space-x-2 h-6 px-2 md:mt-2 mt-4">
+                  <p className="md:text-md text-sm text-primary font-semibold">
+                    ৳{v_product?.sales_price}
+                  </p>
+                  <p className="text-sm text-gray-400 line-through">
+                    ৳{v_product?.mrp_price}
+                  </p>
+                </div>
+
+                <div className="p-2.5">
+                  <AddToCart
+                    productDetails={v_product}
+                    buttonText="Add To Cart"
+                  />
+                </div>
+              </div>
             </div>
-          )}
+          ))}
+        </div>
+      ) : (
+        <div className="text-center">
+          <div className="font-bold text-red-600 text-2xl">
+            No result found
+          </div>
+          <div>Please search again ...</div>
+          <Image
+            src={noResultFound}
+            alt="No Result"
+            className="h-[60%] w-[60%] mx-auto mt-10 rounded-md"
+          />
         </div>
       )}
 
-      {/* ---------------- PAGINATION UI ---------------- */}
+      {/* ---------------- PAGINATION ---------------- */}
 
-      {currentItems?.length >= itemsPerPage && (
+      {totalPages > 1 && (
         <div className="flex justify-center mt-6 space-x-2">
           <button
-            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            onClick={() =>
+              setCurrentPage((prev) => Math.max(prev - 1, 1))
+            }
             disabled={currentPage === 1}
             className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
           >
@@ -175,7 +179,9 @@ function ProductCart(props) {
 
           <button
             onClick={() =>
-              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+              setCurrentPage((prev) =>
+                Math.min(prev + 1, totalPages)
+              )
             }
             disabled={currentPage === totalPages}
             className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
