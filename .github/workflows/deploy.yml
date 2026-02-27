@@ -1,43 +1,28 @@
-name: Deploy to EC2
+script: |
+  set -e
 
-on:
-  push:
-    branches:
-      - main
+  echo "🚀 Starting deployment..."
 
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
+  cd /var/www/prosadhoni.com/prosadhoni
 
-    steps:
-      - name: Deploy to EC2 via SSH
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          port: 22
-          script: |
-            set -e
+  echo "📥 Pulling latest code..."
+  git fetch origin
+  git reset --hard origin/main
 
-            echo "🚀 Starting deployment..."
+  echo "🔎 Checking Node version..."
+  node -v
+  npm -v
 
-            cd /var/www/prosadhoni.com/prosadhoni
+  echo "📦 Installing dependencies..."
+  npm ci
 
-            echo "📥 Pulling latest code..."
-            git fetch origin
-            git reset --hard origin/main
+  echo "🏗 Building project..."
+  npm run build
 
-            echo "📦 Installing dependencies..."
-            npm ci
+  echo "♻ Reloading PM2..."
+  pm2 reload ecosystem.config.js --update-env || pm2 start ecosystem.config.js
 
-            echo "🏗 Building project..."
-            npm run build
+  echo "💾 Saving PM2..."
+  pm2 save
 
-            echo "♻ Reloading PM2 (Zero downtime)..."
-            pm2 reload ecosystem.config.js --update-env || pm2 start ecosystem.config.js
-
-            echo "💾 Saving PM2 process list..."
-            pm2 save
-
-            echo "✅ Deployment successfully completed!"
+  echo "✅ Deployment successfully completed!"
