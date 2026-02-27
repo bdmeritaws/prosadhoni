@@ -8,11 +8,10 @@ import { useSelector } from "react-redux";
 import noResultFound from "../../public/No-Result-Found.jpg";
 import Image from "next/image";
 
-function ProductCart({ type }) {
+function ProductCart({ slug }) {
   const AppURL = process.env.NEXT_PUBLIC_BASE_URL;
 
   const categoryId = useSelector((state) => state.products.categorySlag);
-  const productName = useSelector((state) => state.products.productName);
 
   const [products, setProducts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -37,15 +36,14 @@ function ProductCart({ type }) {
         limit: itemsPerPage,
       };
 
-      if (productName && productName !== "") {
+      // 🔥 URL SLUG PRIORITY
+      if (slug) {
         url = AppURL + "product_by_name";
-        bodyData.product_name = productName;
+        bodyData.product_name = slug;
       } else {
         url = AppURL + "product";
-        bodyData.category_id = categoryId ? categoryId : 0;
+        bodyData.category_id = categoryId || 0;
       }
-
-      console.log("Sending API:", bodyData); // DEBUG
 
       const response = await fetch(url, {
         method: "POST",
@@ -53,12 +51,10 @@ function ProductCart({ type }) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(bodyData),
-        cache: "no-store", // important for production
+        cache: "no-store",
       });
 
       const res = await response.json();
-
-      console.log("API Response:", res); // DEBUG
 
       setProducts(res?.products || []);
 
@@ -79,76 +75,80 @@ function ProductCart({ type }) {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [categoryId, productName]);
+  }, [slug, categoryId]);
 
   /* ---------------- MAIN FETCH ---------------- */
 
   useEffect(() => {
     fetchProducts(currentPage);
-  }, [categoryId, productName, currentPage]);
+  }, [slug, categoryId, currentPage]);
 
-  /* ---------------- UI ---------------- */
+  /* ---------------- RENDER ---------------- */
 
   return (
     <div>
       {isLoading ? (
         <Loader />
-      ) : products.length > 0 ? (
-        <div className="grid lg:grid-cols-5 grid-cols-2 md:gap-4 gap-2.5">
-          {products.map((v_product, index) => (
-            <div
-              key={index}
-              className="group rounded-md bg-white border border-gray-300 overflow-hidden"
-            >
-              <div className="relative w-full overflow-hidden">
-                <Link href={`/product/${v_product.slag_name}`}>
-                  <img
-                    src={v_product?.product_image}
-                    alt={v_product?.product_name}
-                    className="hover:scale-110 duration-500 mx-auto mt-2 rounded-md cursor-pointer md:w-[200px] md:h-[200px] w-[120px] h-[120px]"
-                  />
-                </Link>
-              </div>
-
-              <div className="md:pt-4 pt-2">
-                <div className="md:h-12 h-14 w-[99%] mx-auto text-center mt-1">
-                  <Link href={`/product/${v_product.slag_name}`}>
-                    <h4 className="text-gray-800 text-sm hover:text-primary transition">
-                      {v_product?.product_name}
-                    </h4>
-                  </Link>
-                </div>
-
-                <div className="flex justify-center space-x-2 h-6 px-2 md:mt-2 mt-4">
-                  <p className="md:text-md text-sm text-primary font-semibold">
-                    ৳{v_product?.sales_price}
-                  </p>
-                  <p className="text-sm text-gray-400 line-through">
-                    ৳{v_product?.mrp_price}
-                  </p>
-                </div>
-
-                <div className="p-2.5">
-                  <AddToCart
-                    productDetails={v_product}
-                    buttonText="Add To Cart"
-                  />
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
       ) : (
-        <div className="text-center">
-          <div className="font-bold text-red-600 text-2xl">
-            No result found
-          </div>
-          <div>Please search again ...</div>
-          <Image
-            src={noResultFound}
-            alt="No Result"
-            className="h-[60%] w-[60%] mx-auto mt-10 rounded-md"
-          />
+        <div>
+          {products?.length > 0 ? (
+            <div className="grid lg:grid-cols-5 grid-cols-2 md:gap-4 gap-2.5">
+              {products.map((v_product, index) => (
+                <div
+                  key={index}
+                  className="group rounded-md bg-white border border-gray-300 overflow-hidden"
+                >
+                  <div className="relative w-full overflow-hidden">
+                    <Link href={`/product/${v_product.slag_name}`}>
+                      <img
+                        src={v_product?.product_image}
+                        className="hover:scale-110 duration-500 mx-auto mt-2 rounded-md cursor-pointer md:w-[200px] md:h-[200px] w-[120px] h-[120px]"
+                        alt={v_product?.product_name}
+                      />
+                    </Link>
+                  </div>
+
+                  <div className="md:pt-4 pt-2">
+                    <div className="md:h-12 h-14 w-[99%] mx-auto text-center mt-1">
+                      <Link href={`/product/${v_product.slag_name}`}>
+                        <h4 className="text-gray-800 text-sm hover:text-primary transition">
+                          {v_product?.product_name}
+                        </h4>
+                      </Link>
+                    </div>
+
+                    <div className="flex justify-center space-x-2 h-6 px-2 md:mt-2 mt-4">
+                      <p className="md:text-md text-sm text-primary font-semibold">
+                        ৳{v_product?.sales_price}
+                      </p>
+                      <p className="text-sm text-gray-400 line-through">
+                        ৳{v_product?.mrp_price}
+                      </p>
+                    </div>
+
+                    <div className="p-2.5">
+                      <AddToCart
+                        productDetails={v_product}
+                        buttonText="Add To Cart"
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center">
+              <div className="font-bold text-red-600 text-2xl">
+                No result found
+              </div>
+              <div>Please search again ...</div>
+              <Image
+                src={noResultFound}
+                alt="No Result"
+                className="h-[60%] w-[60%] mx-auto mt-10 rounded-md"
+              />
+            </div>
+          )}
         </div>
       )}
 
