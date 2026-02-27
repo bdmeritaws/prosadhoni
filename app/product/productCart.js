@@ -31,7 +31,7 @@ function ProductCart(props) {
         fetch(static_Url, {
             method: "POST",
             headers: {
-                "Content-Type": "application/json",
+                "Content-Type": "application/json"
             },
             body: JSON.stringify({
                 ClientService: 'frontend-client',
