@@ -4,15 +4,15 @@ import Image from "next/image";
 import Link from "next/link";
 
 const concerns = [
-  { id: 1, name: "Acne", image: "/images/shopbyconcern/acne.webp", slug: "acne" },
-  { id: 2, name: "Anti Aging", image: "/images/shopbyconcern/anti-aging.webp", slug: "anti-aging" },
-  { id: 3, name: "Dandruff", image: "/images/shopbyconcern/dandruff.webp", slug: "dandruff" },
-  { id: 4, name: "Dry Skin", image: "/images/shopbyconcern/dry-skin.webp", slug: "dry-skin" },
-  { id: 5, name: "Lips", image: "/images/shopbyconcern/lips.webp", slug: "lips" },
-  { id: 6, name: "Hair Fall", image: "/images/shopbyconcern/hair-fall.webp", slug: "hair-fall" },
-  { id: 7, name: "Pore", image: "/images/shopbyconcern/pore.webp", slug: "pore" },
-  { id: 8, name: "Spot", image: "/images/shopbyconcern/spot.webp", slug: "spot" },
-  { id: 9, name: "Sunburn", image: "/images/shopbyconcern/sunburn.webp", slug: "sunburn" },
+  { id: 1, name: "Acne", image: "https://babshahi.s3.ap-south-1.amazonaws.com/category/acne.webp", slug: "acne" },
+  { id: 2, name: "Anti Aging", image: "https://babshahi.s3.ap-south-1.amazonaws.com/category/anti-aging.webp", slug: "anti-aging" },
+  { id: 3, name: "Dandruff", image: "https://babshahi.s3.ap-south-1.amazonaws.com/category/dandruff.webp", slug: "dandruff" },
+  { id: 4, name: "Dry Skin", image: "https://babshahi.s3.ap-south-1.amazonaws.com/category/dry-skin.webp", slug: "dry-skin" },
+  { id: 5, name: "Lips", image: "https://babshahi.s3.ap-south-1.amazonaws.com/category/lips.webp", slug: "lips" },
+  { id: 6, name: "Hair Fall", image: "https://babshahi.s3.ap-south-1.amazonaws.com/category/hair-fall.webp", slug: "hair-fall" },
+  { id: 7, name: "Pore", image: "https://babshahi.s3.ap-south-1.amazonaws.com/category/pore.webp", slug: "pore" },
+  { id: 8, name: "Spot", image: "https://babshahi.s3.ap-south-1.amazonaws.com/category/spot.webp", slug: "spot" },
+  { id: 9, name: "Sunburn", image: "https://babshahi.s3.ap-south-1.amazonaws.com/category/sunburn.webp", slug: "sunburn" },
 ];
 
 function ShopByConcern() {
