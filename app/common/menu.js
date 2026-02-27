@@ -73,13 +73,13 @@ function Menu({ category }) {
         <div className="bg-white px-3 py-3 shadow-sm">
           <div className="flex items-center gap-2">
             {/* Categories */}
-            <div className="relative w-[130px]">
-              <div className="flex items-center justify-center gap-1 h-11 bg-gray-100 rounded-md text-sm font-medium text-gray-700">
+            <div className="relative w-[120px] flex-shrink-0">
+              <div className="flex items-center justify-center gap-1 h-11 bg-gray-100 rounded-md text-sm font-medium text-gray-700 px-2">
                 ☰ Categories
               </div>
 
               <select
-                className="absolute inset-0 opacity-0 cursor-pointer"
+                className="absolute inset-0 opacity-0 cursor-pointer w-full"
                 onChange={(e) => handelMenu(e.target.value)}
               >
                 <option value="0">Categories</option>
@@ -98,14 +98,15 @@ function Menu({ category }) {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search products"
-                className="flex-1 px-3 bg-transparent outline-none text-sm"
+                className="flex-1 px-3 bg-transparent outline-none text-sm text-gray-700 min-w-0"
               />
 
               <button
                 onClick={handleSearch}
-                className="px-4 bg-[#6F1D6C] text-white flex items-center justify-center"
+                className="px-4 bg-[#6F1D6C] text-white flex items-center justify-center flex-shrink-0"
+                aria-label="Search"
               >
-                <Search size={16} />
+                <Search size={18} />
               </button>
             </div>
           </div>
