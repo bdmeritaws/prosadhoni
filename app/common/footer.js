@@ -1,7 +1,8 @@
 import React from "react";
 import Image from "next/image";
 import { Facebook, Instagram, Youtube } from "react-bootstrap-icons";
-
+const LOGO_URL =
+  "https://babshahi.s3.ap-south-1.amazonaws.com/category/logo-prosadhoni.webp";
 function Footer() {
   return (
     <footer className="bg-gradient-to-r from-[#2b2f33] to-[#1f2327] text-gray-300 py-12 px-6 md:px-16 mt-4">
@@ -9,10 +10,12 @@ function Footer() {
         <div>
           <div className="flex items-center gap-2 mb-4">
             <Image
-              src="/images/logo/logo-prosadhoni.webp"
+              src={LOGO_URL}
               alt="Prosadhoni Logo"
-              width={40}
-              height={40}
+              width={32}
+              height={32}
+              className="object-contain"
+              priority
             />
             <h2 className="text-white text-xl font-semibold">
               Prosadhoni
