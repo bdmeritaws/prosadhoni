@@ -26,16 +26,18 @@ function ProductCart(props) {
     const categoryId = useSelector(state => state.products.categorySlag);
     const productName = useSelector(state => state.products.productName);
 
+    // Dynamic headers function to handle CORS properly in production
+    const getHeaders = () => ({
+        "Content-Type": "application/json",
+        "Origin": typeof window !== 'undefined' ? window.location.origin : 'https://babshahi.com',
+        "Referer": typeof window !== 'undefined' ? window.location.href : 'https://babshahi.com',
+    });
+
     const productListByCategory = (categoryId) => {
         const static_Url = AppURL + "product";
         fetch(static_Url, {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Origin": "https://babshahi.com",
-                "Referer": "https://babshahi.com",
-                "User-Agent": "Mozilla/5.0"
-            },
+            headers: getHeaders(),
             body: JSON.stringify({
                 ClientService: 'frontend-client',
                 AuthKey: 'Babshahi',
@@ -53,7 +55,7 @@ function ProductCart(props) {
                 }, 1000);
             })
         }).catch((error) => {
-            console.log(error);
+            console.log("Category API Error:", error);
         });
     }
 
@@ -61,6 +63,7 @@ function ProductCart(props) {
         const static_Url = AppURL + "product_by_name";
         fetch(static_Url, {
             method: "POST",
+            headers: getHeaders(),
             body: JSON.stringify({
                 ClientService: 'frontend-client',
                 AuthKey: 'Babshahi',
@@ -78,7 +81,7 @@ function ProductCart(props) {
                 }, 1000);
             })
         }).catch((error) => {
-            console.log(error);
+            console.log("Product Name API Error:", error);
         });
     }
 
