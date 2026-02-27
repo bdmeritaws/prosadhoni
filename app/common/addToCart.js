@@ -77,7 +77,6 @@ function AddToCart(props) {
                         </div>
                     </div>
                 </div>
-
             }
         </div>
     );
