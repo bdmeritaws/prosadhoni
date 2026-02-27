@@ -1,28 +1,50 @@
-script: |
-  set -e
+name: Deploy to EC2
 
-  echo "🚀 Starting deployment..."
+on:
+  push:
+    branches:
+      - main
 
-  cd /var/www/prosadhoni.com/prosadhoni
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
 
-  echo "📥 Pulling latest code..."
-  git fetch origin
-  git reset --hard origin/main
+    steps:
+      - name: Deploy to EC2 via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          port: 22
+          script: |
+            set -e
 
-  echo "🔎 Checking Node version..."
-  node -v
-  npm -v
+            echo "🚀 Starting deployment..."
 
-  echo "📦 Installing dependencies..."
-  npm ci
+            cd /var/www/prosadhoni.com/prosadhoni
 
-  echo "🏗 Building project..."
-  npm run build
+            echo "📥 Syncing with GitHub..."
+            git fetch origin
+            git reset --hard origin/main
 
-  echo "♻ Reloading PM2..."
-  pm2 reload ecosystem.config.js --update-env || pm2 start ecosystem.config.js
+            echo "🔎 Checking Node & NPM versions..."
+            node -v
+            npm -v
 
-  echo "💾 Saving PM2..."
-  pm2 save
+            echo "📦 Installing dependencies..."
+            npm ci
 
-  echo "✅ Deployment successfully completed!"
+            echo "🏗 Building production build..."
+            npm run build
+
+            echo "♻ Reloading PM2 (Fork Mode)..."
+            pm2 reload ecosystem.config.js --update-env || pm2 start ecosystem.config.js
+
+            echo "💾 Saving PM2 process list..."
+            pm2 save
+
+            echo "📊 Current PM2 Status:"
+            pm2 list
+
+            echo "✅ Deployment successfully completed!"
