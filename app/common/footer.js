@@ -36,7 +36,7 @@ function Footer() {
             <li><a href="#" className="hover:text-white transition">FAQ</a></li>
           </ul>
         </div>
-        {/* Company */}
+
         <div>
           <h3 className="text-white font-semibold mb-4 border-b border-gray-600 inline-block pb-1">
             Company
