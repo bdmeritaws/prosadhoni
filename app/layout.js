@@ -45,7 +45,7 @@ export default async function RootLayout({ children }) {
     return (
         <html lang="en">
             <head>
-                <link rel="icon" href="http://localhost:3000/images/logo/favicon.ico" />
+                <link rel="icon" href="/images/logo/favicon.ico" />
             </head>
             <body className={inter.className}>
                 {/* Google Tag Manager */}
