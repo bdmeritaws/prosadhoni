@@ -8,7 +8,7 @@ export default function SectionHeader({ title, href = "#" }) {
       <h2 className="text-xl font-bold text-gray-800">{title}</h2>
       <Link
         href={href}
-        className="text-sm text-[#FC8934] hover:underline font-medium"
+        className="text-sm text-[#FC8934] hover:underline font-bold"
       >
         View All
       </Link>

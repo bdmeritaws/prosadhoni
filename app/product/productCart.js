@@ -8,7 +8,7 @@ import { useSelector } from "react-redux";
 import noResultFound from "../../public/No-Result-Found.jpg";
 import Image from "next/image";
 
-function ProductCart({ slug }) {
+function ProductCart({ slug, filterType }) {
   const AppURL = process.env.NEXT_PUBLIC_BASE_URL;
 
   const categoryId = useSelector((state) => state.products.categorySlag);
@@ -36,8 +36,15 @@ function ProductCart({ slug }) {
         limit: itemsPerPage,
       };
 
-      // 🔥 URL SLUG PRIORITY
-      if (slug) {
+      // Handle filter type (top_deals, under_99)
+      if (filterType === "top_deals") {
+        url = AppURL + "product_top_deal";
+        bodyData.category_id = "";
+      } else if (filterType === "under_99") {
+        url = AppURL + "product_under_99";
+        bodyData.category_id = "";
+      } else if (slug) {
+        // 🔥 URL SLUG PRIORITY - for search
         url = AppURL + "product_by_name";
         bodyData.product_name = slug;
       } else {
@@ -77,14 +84,14 @@ function ProductCart({ slug }) {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [slug, categoryId]);
+  }, [slug, categoryId, filterType]);
 
   /* ---------------- MAIN FETCH ---------------- */
 
   useEffect(() => {
-    console.log("Fetch triggered - slug:", slug, "categoryId:", categoryId, "currentPage:", currentPage);
+    console.log("Fetch triggered - slug:", slug, "categoryId:", categoryId, "filterType:", filterType, "currentPage:", currentPage);
     fetchProducts(currentPage);
-  }, [slug, categoryId, currentPage]);
+  }, [slug, categoryId, filterType, currentPage]);
 
   /* ---------------- RENDER ---------------- */
 
