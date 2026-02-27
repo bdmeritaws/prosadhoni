@@ -54,7 +54,6 @@ function Footer() {
           </h3>
 
           <div className="space-y-3 mt-3">
-
             {/* Google Play Button */}
             <a
               href="#"
