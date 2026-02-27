@@ -52,7 +52,7 @@ const categories = [
     id: 7,
     name: "Organic Beauty",
     image:
-      "https://babshahi.s3.ap-south-1.amazonaws.com/category/organic-beauty.webp",
+      "https://babshahi.s3.ap-south-1.amazonaws.com/category/logo.jpeg",
     slug: "organic-beauty",
   },
   {
