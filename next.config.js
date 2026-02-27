@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: 'https',
@@ -10,7 +11,7 @@ const nextConfig = {
       {
         protocol: 'https',
         hostname: 'babshahi.s3.ap-south-1.amazonaws.com',
-        pathname: '/**',   // allow all paths from S3
+        pathname: '/**',
       },
     ],
   },
