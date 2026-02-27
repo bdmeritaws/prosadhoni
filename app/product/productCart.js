@@ -49,6 +49,8 @@ function ProductCart({ slug }) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Origin": typeof window !== 'undefined' ? window.location.origin : "https://babshahi.com",
+          "Referer": typeof window !== 'undefined' ? window.location.href : "https://babshahi.com",
         },
         body: JSON.stringify(bodyData),
         cache: "no-store",
@@ -80,6 +82,7 @@ function ProductCart({ slug }) {
   /* ---------------- MAIN FETCH ---------------- */
 
   useEffect(() => {
+    console.log("Fetch triggered - slug:", slug, "categoryId:", categoryId, "currentPage:", currentPage);
     fetchProducts(currentPage);
   }, [slug, categoryId, currentPage]);
 

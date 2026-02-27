@@ -5,7 +5,7 @@ import Product from "@/app/product/product";
 function Search({params}) {
     return (
         <div>
-            <Product/>
+            <Product slug={params?.categoryId}/>
         </div>
     );
 }

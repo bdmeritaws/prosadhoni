@@ -1,11 +1,11 @@
 import React from 'react';
 import ProductCart from "@/app/product/productCart";
 
-function Product(props) {
+function Product({slug}) {
     return (
         <>
             <div className="container mt-7">
-                <ProductCart/>
+                <ProductCart slug={slug}/>
             </div>
         </>
     );
