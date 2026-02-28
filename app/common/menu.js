@@ -19,17 +19,13 @@ function Menu({ category }) {
   const [totalCart, setTotalCart] = useState(0);
   const [search, setSearch] = useState("");
 
-  // Initialize search from URL on mount (only for search pages)
+  // Initialize search from localStorage (persists across navigation)
   const [isInitialized, setIsInitialized] = useState(false);
   
   useEffect(() => {
-    const pathname = window.location.pathname;
-    // Only set search from URL if we're on a search page
-    if (pathname.startsWith('/search/')) {
-      const searchTerm = pathname.replace('/search/', '');
-      if (searchTerm) {
-        setSearch(searchTerm);
-      }
+    const savedSearch = localStorage.getItem('menuSearch');
+    if (savedSearch) {
+      setSearch(savedSearch);
     }
     setIsInitialized(true);
   }, []);
@@ -44,6 +40,9 @@ function Menu({ category }) {
     
     const timeoutId = setTimeout(() => {
       if (search.trim().length >= 1) {
+        // Save to localStorage
+        localStorage.setItem('menuSearch', search);
+        
         const pathname = window.location.pathname;
         // Only navigate if we're on home page or already on search page
         if (pathname === '/' || pathname.startsWith('/search')) {
