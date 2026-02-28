@@ -7,7 +7,7 @@ const features = [
     id: 1,
     mainText: "100%",
     subText: "Authentic",
-    image: "https://babshahi.s3.ap-south-1.amazonaws.com/category/100%-authentic.webp",
+    image: "https://babshahi.s3.ap-south-1.amazonaws.com/category/100-percent-authentic.webp",
     bgColor: "bg-purple-100",
     ringColor: "ring-purple-200",
   },
