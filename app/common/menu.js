@@ -1,62 +1,56 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import { Bag, Person, Search } from "react-bootstrap-icons";
 import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
 import { categorySlag, productName } from "@/app/redux/product/productSlice";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 const LOGO_URL =
   "https://babshahi.s3.ap-south-1.amazonaws.com/category/logo-prosadhoni.webp";
 
 function Menu({ category }) {
   const router = useRouter();
+  const pathname = usePathname();
   const dispatch = useDispatch();
 
   const cartProduct = useSelector((state) => state.products.productCart);
   const [totalCart, setTotalCart] = useState(0);
   const [search, setSearch] = useState("");
+  const inputRef = useRef(null);
 
-  // Initialize search from localStorage (persists across navigation)
-  const [isInitialized, setIsInitialized] = useState(false);
-  
-  useEffect(() => {
-    const savedSearch = localStorage.getItem('menuSearch');
-    if (savedSearch) {
-      setSearch(savedSearch);
-    }
-    setIsInitialized(true);
-  }, []);
-
+  // ================= CART COUNT =================
   useEffect(() => {
     setTotalCart(cartProduct?.length || 0);
   }, [cartProduct]);
 
-  // Debounced search on change (only after initialization)
+  // ================= CLEAR SEARCH WHEN GO HOME =================
   useEffect(() => {
-    if (!isInitialized) return;
-    
+    if (pathname === "/") {
+      setSearch("");
+    }
+  }, [pathname]);
+
+  // ================= AUTO FOCUS ON SEARCH PAGE =================
+  useEffect(() => {
+    if (pathname.startsWith("/search")) {
+      inputRef.current?.focus();
+    }
+  }, [pathname]);
+
+  // ================= DEBOUNCED SEARCH =================
+  useEffect(() => {
     const timeoutId = setTimeout(() => {
       if (search.trim().length >= 1) {
-        // Save to localStorage
-        localStorage.setItem('menuSearch', search);
-        
-        const pathname = window.location.pathname;
-        // Only navigate if we're on home page or already on search page
-        if (pathname === '/' || pathname.startsWith('/search')) {
-          const searchPath = `/search/${search}`;
-          if (pathname !== searchPath) {
-            dispatch(productName(search));
-            router.push(searchPath);
-          }
-        }
+        dispatch(productName(search));
+        router.push(`/search/${search}`);
       }
-    }, 500); // Wait 500ms after user stops typing
+    }, 500);
 
     return () => clearTimeout(timeoutId);
-  }, [search, dispatch, router, isInitialized]);
+  }, [search]);
 
   const handleSearch = () => {
     if (search.trim().length >= 1) {
@@ -67,7 +61,7 @@ function Menu({ category }) {
 
   const handelMenu = (slug) => {
     dispatch(categorySlag(slug));
-    router.push(slug === 0 ? "/" : `/search/${slug}`);
+    router.push(slug === "0" ? "/" : `/search/${slug}`);
   };
 
   return (
@@ -107,7 +101,6 @@ function Menu({ category }) {
         {/* Categories + Search */}
         <div className="bg-white px-3 py-3 shadow-sm">
           <div className="flex items-center gap-2">
-            {/* Categories */}
             <div className="relative w-[120px] flex-shrink-0">
               <div className="flex items-center justify-center gap-1 h-11 bg-gray-100 rounded-md text-sm font-medium text-gray-700 px-2">
                 ☰ Categories
@@ -129,6 +122,7 @@ function Menu({ category }) {
             {/* Search */}
             <div className="flex flex-1 h-11 bg-gray-100 rounded-md overflow-hidden">
               <input
+                ref={inputRef}
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
@@ -139,7 +133,6 @@ function Menu({ category }) {
               <button
                 onClick={handleSearch}
                 className="px-4 bg-[#6F1D6C] text-white flex items-center justify-center flex-shrink-0"
-                aria-label="Search"
               >
                 <Search size={18} />
               </button>
@@ -152,7 +145,6 @@ function Menu({ category }) {
       <div className="hidden md:block bg-[#8F2C8C] shadow-md">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-center justify-between h-[64px]">
-            {/* Logo */}
             <Link href="/" className="flex items-center gap-3">
               <Image
                 src={LOGO_URL}
@@ -185,6 +177,7 @@ function Menu({ category }) {
               </div>
 
               <input
+                ref={inputRef}
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
@@ -201,7 +194,6 @@ function Menu({ category }) {
               </button>
             </div>
 
-            {/* Right Buttons */}
             <div className="flex items-center gap-3">
               <Link
                 href="/cart"
