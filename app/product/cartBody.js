@@ -233,20 +233,38 @@ function CartBody({ productId }) {
                     {/* Contact Buttons */}
                     <div className="mt-6 space-y-3">
 
-                        <div className="bg-black text-white rounded-md py-2 text-center flex justify-center gap-2 cursor-pointer">
+                        {/* Messenger */}
+                        <a
+                            href="https://m.me/prosadhoninew"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="bg-black text-white rounded-md py-2 text-center flex justify-center gap-2 cursor-pointer"
+                        >
                             <Messenger size={18} color="blue" />
                             Chat With Us
-                        </div>
+                        </a>
 
-                        <div className="bg-black text-white rounded-md py-2 text-center flex justify-center gap-2 cursor-pointer">
+                        {/* WhatsApp */}
+                        <a
+                            href={`https://wa.me/8801727123480?text=${encodeURIComponent(
+                                `Hi, I want to know about ${productDetails.product_name}`
+                            )}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="bg-black text-white rounded-md py-2 text-center flex justify-center gap-2 cursor-pointer"
+                        >
                             <Whatsapp size={18} color="green" />
                             WhatsApp Us
-                        </div>
+                        </a>
 
-                        <div className="bg-black text-white rounded-md py-2 text-center flex justify-center gap-2">
+                        {/* Phone */}
+                        <a
+                            href="tel:+8801816668833"
+                            className="bg-black text-white rounded-md py-2 text-center flex justify-center gap-2"
+                        >
                             <Telephone size={18} color="blue" />
                             +8801816 668 833
-                        </div>
+                        </a>
 
                     </div>
                 </div>
