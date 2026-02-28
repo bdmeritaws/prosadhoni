@@ -19,6 +19,15 @@ function Menu({ category }) {
   const [totalCart, setTotalCart] = useState(0);
   const [search, setSearch] = useState("");
 
+  // Initialize search from URL on mount
+  useEffect(() => {
+    const pathParts = window.location.pathname.split('/');
+    const lastPart = pathParts[pathParts.length - 1];
+    if (lastPart && lastPart !== 'search') {
+      setSearch(lastPart);
+    }
+  }, []);
+
   useEffect(() => {
     setTotalCart(cartProduct?.length || 0);
   }, [cartProduct]);
