@@ -23,8 +23,20 @@ function Menu({ category }) {
     setTotalCart(cartProduct?.length || 0);
   }, [cartProduct]);
 
+  // Debounced search on change
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (search.trim().length >= 1) {
+        dispatch(productName(search));
+        router.push(`/search/${search}`);
+      }
+    }, 500); // Wait 500ms after user stops typing
+
+    return () => clearTimeout(timeoutId);
+  }, [search, dispatch, router]);
+
   const handleSearch = () => {
-    if (search.trim().length >= 3) {
+    if (search.trim().length >= 1) {
       dispatch(productName(search));
       router.push(`/search/${search}`);
     }

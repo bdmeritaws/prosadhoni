@@ -39,33 +39,49 @@ const features = [
 
 export default function Features() {
   return (
-    <div className="container mx-auto mt-12">
-      {/* Use flex instead of grid for closer spacing */}
-      <div className="flex flex-wrap justify-center -mx-4">
+    <div className="container mx-auto mt-10 px-2">
+      <div className="flex justify-center items-start gap-3 sm:gap-6">
         {features.map((feature) => (
-          <div key={feature.id} className="flex flex-col items-center mx-4 mb-4">
-            {/* Circular Icon with individual background and ring */}
+          <div
+            key={feature.id}
+            className="group flex flex-col items-center text-center transition-all duration-300 hover:-translate-y-2"
+          >
+            {/* Circle */}
             <div
-              className={`w-20 h-20 flex items-center justify-center rounded-full ${feature.bgColor} ring-4 ${feature.ringColor} mb-1.5 transition-transform hover:scale-105`}
+              className={`
+                w-14 h-14 
+                sm:w-20 sm:h-20 
+                lg:w-28 lg:h-28 
+                flex items-center justify-center 
+                rounded-full 
+                ${feature.bgColor} 
+                ring-2 sm:ring-4 ${feature.ringColor}
+                mb-2
+                transition-all duration-500
+                group-hover:scale-110
+                group-hover:shadow-xl
+              `}
             >
               <Image
                 src={feature.image}
                 alt={`${feature.mainText} ${feature.subText}`}
-                width={48}
-                height={48}
-                className="object-contain"
+                width={30}
+                height={30}
+                className="object-contain 
+                           sm:w-12 sm:h-12 
+                           lg:w-16 lg:h-16 
+                           transition-transform duration-500 
+                           group-hover:rotate-6"
               />
             </div>
 
-            {/* Text below circle */}
-            <div className="text-center">
-              <span className="text-lg font-bold text-gray-900 block">
-                {feature.mainText}
-              </span>
-              <span className="text-sm font-normal text-gray-700 block">
-                {feature.subText}
-              </span>
-            </div>
+            {/* Text */}
+            <span className="text-xs sm:text-base lg:text-lg font-bold text-gray-900 transition-colors duration-300 group-hover:text-pink-600">
+              {feature.mainText}
+            </span>
+            <span className="text-[10px] sm:text-sm text-gray-700 leading-tight">
+              {feature.subText}
+            </span>
           </div>
         ))}
       </div>
