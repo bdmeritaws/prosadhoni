@@ -20,29 +20,39 @@ function Menu({ category }) {
   const [search, setSearch] = useState("");
 
   // Initialize search from URL on mount
+  const [isInitialized, setIsInitialized] = useState(false);
+  
   useEffect(() => {
     const pathParts = window.location.pathname.split('/');
     const lastPart = pathParts[pathParts.length - 1];
     if (lastPart && lastPart !== 'search') {
       setSearch(lastPart);
     }
+    setIsInitialized(true);
   }, []);
 
   useEffect(() => {
     setTotalCart(cartProduct?.length || 0);
   }, [cartProduct]);
 
-  // Debounced search on change
+  // Debounced search on change (only after initialization)
   useEffect(() => {
+    if (!isInitialized) return;
+    
     const timeoutId = setTimeout(() => {
       if (search.trim().length >= 1) {
-        dispatch(productName(search));
-        router.push(`/search/${search}`);
+        const currentPath = window.location.pathname;
+        const searchPath = `/search/${search}`;
+        // Only navigate if not already on the same search page
+        if (currentPath !== searchPath) {
+          dispatch(productName(search));
+          router.push(searchPath);
+        }
       }
     }, 500); // Wait 500ms after user stops typing
 
     return () => clearTimeout(timeoutId);
-  }, [search, dispatch, router]);
+  }, [search, dispatch, router, isInitialized]);
 
   const handleSearch = () => {
     if (search.trim().length >= 1) {
