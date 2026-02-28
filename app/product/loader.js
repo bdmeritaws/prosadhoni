@@ -6,7 +6,7 @@ function Loader(props) {
             {[...Array(10)].map((_, index) => (
                 <div key={index} className="border h-96 border-blue-300 shadow rounded-md p-4 animate-pulse">
                     <div className="h-36 bg-slate-200 rounded">
-                        <img src="https://www.svgrepo.com/show/99075/picture.svg" className="h-28 w-28 mx-auto pt-5"/>
+                        <img src="/images/logo/picture.svg" className="h-28 w-28 mx-auto pt-5"/>
                     </div>
                     <div className="animate-pulse flex space-x-4 mt-5">
                         <div className="flex-1 space-y-6 py-1">
