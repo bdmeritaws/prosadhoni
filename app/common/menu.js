@@ -19,14 +19,17 @@ function Menu({ category }) {
   const [totalCart, setTotalCart] = useState(0);
   const [search, setSearch] = useState("");
 
-  // Initialize search from URL on mount
+  // Initialize search from URL on mount (only for search pages)
   const [isInitialized, setIsInitialized] = useState(false);
   
   useEffect(() => {
-    const pathParts = window.location.pathname.split('/');
-    const lastPart = pathParts[pathParts.length - 1];
-    if (lastPart && lastPart !== 'search') {
-      setSearch(lastPart);
+    const pathname = window.location.pathname;
+    // Only set search from URL if we're on a search page
+    if (pathname.startsWith('/search/')) {
+      const searchTerm = pathname.replace('/search/', '');
+      if (searchTerm) {
+        setSearch(searchTerm);
+      }
     }
     setIsInitialized(true);
   }, []);
@@ -41,12 +44,14 @@ function Menu({ category }) {
     
     const timeoutId = setTimeout(() => {
       if (search.trim().length >= 1) {
-        const currentPath = window.location.pathname;
-        const searchPath = `/search/${search}`;
-        // Only navigate if not already on the same search page
-        if (currentPath !== searchPath) {
-          dispatch(productName(search));
-          router.push(searchPath);
+        const pathname = window.location.pathname;
+        // Only navigate if we're on home page or already on search page
+        if (pathname === '/' || pathname.startsWith('/search')) {
+          const searchPath = `/search/${search}`;
+          if (pathname !== searchPath) {
+            dispatch(productName(search));
+            router.push(searchPath);
+          }
         }
       }
     }, 500); // Wait 500ms after user stops typing
