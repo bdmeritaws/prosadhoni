@@ -59,9 +59,9 @@ function Menu({ category }) {
     }
   };
 
-  const handelMenu = (slug) => {
-    dispatch(categorySlag(slug));
-    router.push(slug === "0" ? "/" : `/search/${slug}`);
+  const handelMenu = (id) => {
+    dispatch(categorySlag(id));
+    router.push(id === "0" ? "/" : `/category/${id}`);
   };
 
   return (
@@ -112,7 +112,7 @@ function Menu({ category }) {
               >
                 <option value="0">Categories</option>
                 {category?.map((cat, i) => (
-                  <option key={i} value={cat.category_slug}>
+                  <option key={i} value={cat.id}>
                     {cat.main_category_name}
                   </option>
                 ))}
@@ -169,7 +169,7 @@ function Menu({ category }) {
                 >
                   <option value="0">Categories</option>
                   {category?.map((cat, i) => (
-                    <option key={i} value={cat.category_slug}>
+                    <option key={i} value={cat.id}>
                       {cat.main_category_name}
                     </option>
                   ))}

@@ -36,17 +36,29 @@ function ProductCart({ slug, filterType }) {
         limit: itemsPerPage,
       };
 
-      // Handle filter type (top_deals, under_99)
+      // Handle filter type (top_deals, under_99, category)
       if (filterType === "top_deals") {
         url = AppURL + "product_top_deal";
         bodyData.category_id = "";
       } else if (filterType === "under_99") {
         url = AppURL + "product_under_99";
         bodyData.category_id = "";
+      } else if (filterType === "category") {
+        // Category page - fetch products by category ID
+        url = AppURL + "product_by_category";
+        bodyData.category_id = slug;
       } else if (slug) {
-        // 🔥 URL SLUG PRIORITY - for search
-        url = AppURL + "product_by_name";
-        bodyData.product_name = slug;
+        // 🔥 Check if slug is numeric (category ID) or string (search text)
+        const isCategoryId = /^[0-9]+$/.test(slug);
+        if (isCategoryId) {
+          // Category ID - fetch products by category
+          url = AppURL + "product_by_category";
+          bodyData.category_id = slug;
+        } else {
+          // Search text - fetch products by name
+          url = AppURL + "product_by_name";
+          bodyData.product_name = slug;
+        }
       } else {
         url = AppURL + "product";
         bodyData.category_id = categoryId || 0;
