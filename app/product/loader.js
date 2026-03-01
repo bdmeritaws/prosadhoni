@@ -2,7 +2,7 @@ import React from 'react';
 
 function Loader(props) {
     return (
-        <div className="grid lg:grid-cols-5 grid-cols-2 gap-6">
+        <div className="container grid lg:grid-cols-5 grid-cols-2 gap-6">
             {[...Array(10)].map((_, index) => (
                 <div key={index} className="border h-96 border-blue-300 shadow rounded-md p-4 animate-pulse">
                     <div className="h-36 bg-slate-200 rounded">
