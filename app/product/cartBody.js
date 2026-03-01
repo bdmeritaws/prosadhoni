@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import Loader from "@/app/product/loader";
 import AddToCart from "@/app/common/addToCart";
 import ProductCart from "@/app/product/productCart";
+import RelatedProducts from "@/app/product/relatedProducts";
 import { Messenger, Whatsapp, Telephone } from "react-bootstrap-icons";
 
 
@@ -317,7 +318,7 @@ function CartBody({ productId }) {
 
             {/* ================= RELATED PRODUCTS ================= */}
             <div className="mt-10">
-                <ProductCart type={0} />
+                <RelatedProducts categoryId={productDetails.category_id} />
             </div>
 
         </div>
