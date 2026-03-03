@@ -8,7 +8,7 @@ import { useSelector } from "react-redux";
 import noResultFound from "../../public/No-Result-Found.jpg";
 import Image from "next/image";
 
-function ProductCart({ slug, filterType }) {
+function ProductCart({ slug, filterType, subCategory }) {
   const AppURL = process.env.NEXT_PUBLIC_BASE_URL;
 
   const categoryId = useSelector((state) => state.products.categorySlag);
@@ -44,9 +44,18 @@ function ProductCart({ slug, filterType }) {
         url = AppURL + "product_under_99";
         bodyData.category_id = "";
       } else if (filterType === "category") {
-        // Category page - fetch products by category ID
-        url = AppURL + "product_by_category";
-        bodyData.category_id = slug;
+        // Check if subcategory is selected (not "all")
+        if (subCategory && subCategory !== "all") {
+          // Fetch products by subcategory
+          url = AppURL + "product_by_subcategory";
+          bodyData.subcategory_id = subCategory;
+          console.log("Fetching products by subcategory:", subCategory);
+        } else {
+          // Fetch products by category ID (show all products in category)
+          url = AppURL + "product_by_category";
+          bodyData.category_id = slug;
+          console.log("Fetching all products for category:", slug);
+        }
       } else if (slug) {
         // 🔥 Check if slug is numeric (category ID) or string (search text)
         const isCategoryId = /^[0-9]+$/.test(slug);
@@ -81,6 +90,8 @@ function ProductCart({ slug, filterType }) {
 
       if (res?.total) {
         setTotalPages(Math.ceil(res.total / itemsPerPage));
+      } else if (res?.products?.length) {
+        setTotalPages(1);
       } else {
         setTotalPages(1);
       }
@@ -96,14 +107,14 @@ function ProductCart({ slug, filterType }) {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [slug, categoryId, filterType]);
+  }, [slug, categoryId, filterType, subCategory]);
 
   /* ---------------- MAIN FETCH ---------------- */
 
   useEffect(() => {
-    console.log("Fetch triggered - slug:", slug, "categoryId:", categoryId, "filterType:", filterType, "currentPage:", currentPage);
+    console.log("Fetch triggered - slug:", slug, "categoryId:", categoryId, "filterType:", filterType, "subCategory:", subCategory, "currentPage:", currentPage);
     fetchProducts(currentPage);
-  }, [slug, categoryId, filterType, currentPage]);
+  }, [slug, categoryId, filterType, subCategory, currentPage]);
 
   /* ---------------- RENDER ---------------- */
 
@@ -114,7 +125,7 @@ function ProductCart({ slug, filterType }) {
       ) : (
         <div>
           {products?.length > 0 ? (
-            <div className="grid lg:grid-cols-5 grid-cols-2 md:gap-4 gap-2.5">
+            <div className="grid lg:grid-cols-4 grid-cols-2 md:gap-4 gap-2.5">
               {products.map((v_product, index) => (
                 <div
                   key={index}

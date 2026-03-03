@@ -11,42 +11,42 @@ const categories = [
     name: "Skincare",
     image:
       "https://babshahi.s3.ap-south-1.amazonaws.com/category/skincare.webp",
-    slug: "Skin",
+    slug: "22",
   },
   {
     id: 2,
     name: "Haircare",
     image:
       "https://babshahi.s3.ap-south-1.amazonaws.com/category/haircare.webp",
-    slug: "Hair",
+    slug: "23",
   },
   {
     id: 3,
     name: "Personal Care",
     image:
       "https://babshahi.s3.ap-south-1.amazonaws.com/category/personal-care.webp",
-    slug: "Personal Care",
+    slug: "27",
   },
   {
     id: 4,
     name: "Men's Grooming",
     image:
       "https://babshahi.s3.ap-south-1.amazonaws.com/category/men’s-grooming.webp",
-    slug: "mens-grooming",
+    slug: "25",
   },
   {
     id: 5,
     name: "Fragrance & Perfume",
     image:
       "https://babshahi.s3.ap-south-1.amazonaws.com/category/fragrance-&-perfume.webp",
-    slug: "fragrance-perfume",
+    slug: "26",
   },
   {
     id: 6,
     name: "Makeup",
     image:
       "https://babshahi.s3.ap-south-1.amazonaws.com/category/makeup.webp",
-    slug: "makeup",
+    slug: "134",
   },
   {
     id: 7,
@@ -60,7 +60,7 @@ const categories = [
     name: "Beauty Tools & Device",
     image:
       "https://babshahi.s3.ap-south-1.amazonaws.com/category/beauty-tools-&-device.webp",
-    slug: "beauty-tools-device",
+    slug: "135",
   },
 ];
 
@@ -79,7 +79,7 @@ function ShopByCategory() {
         {categories.map((category) => (
           <Link
             key={category.id}
-            href={`/search/${category.slug}`}
+            href={`/category/${category.slug}`}
             onClick={() => dispatch(categorySlag(category.slug))}
             className="group"
           >
