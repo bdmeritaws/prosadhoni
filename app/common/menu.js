@@ -19,7 +19,23 @@ function Menu({ category }) {
   const cartProduct = useSelector((state) => state.products.productCart);
   const [totalCart, setTotalCart] = useState(0);
   const [search, setSearch] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("Categories");
   const inputRef = useRef(null);
+
+  // ================= UPDATE SELECTED CATEGORY FROM URL =================
+  useEffect(() => {
+    if (pathname.startsWith("/product/category/")) {
+      const categoryId = pathname.split("/")[3];
+      if (categoryId && category !== "0") {
+        const foundCategory = category?.find((cat) => cat.id === categoryId);
+        if (foundCategory) {
+          setSelectedCategory(foundCategory.main_category_name);
+        }
+      }
+    } else {
+      setSelectedCategory("Categories");
+    }
+  }, [pathname, category]);
 
   // ================= CART COUNT =================
   useEffect(() => {
@@ -59,9 +75,10 @@ function Menu({ category }) {
     }
   };
 
-  const handelMenu = (id) => {
+  const handelMenu = (id, name = "Categories") => {
+    setSelectedCategory(name);
     dispatch(categorySlag(id));
-    router.push(id === "0" ? "/" : `/category/${id}`);
+    router.push(id === "0" ? "/" : `/product/category/${id}`);
   };
 
   return (
@@ -103,12 +120,16 @@ function Menu({ category }) {
           <div className="flex items-center gap-2">
             <div className="relative w-[120px] flex-shrink-0">
               <div className="flex items-center justify-center gap-1 h-11 bg-gray-100 rounded-md text-sm font-medium text-gray-700 px-2">
-                ☰ Categories
+                ☰ {selectedCategory}
               </div>
 
               <select
                 className="absolute inset-0 opacity-0 cursor-pointer w-full"
-                onChange={(e) => handelMenu(e.target.value)}
+                value=""
+                onChange={(e) => {
+                  const selectedOption = e.target.options[e.target.selectedIndex];
+                  handelMenu(e.target.value, selectedOption.text);
+                }}
               >
                 <option value="0">Categories</option>
                 {category?.map((cat, i) => (
@@ -162,10 +183,14 @@ function Menu({ category }) {
             {/* Search Area */}
             <div className="flex items-center bg-white rounded-md overflow-hidden w-[560px] h-[40px] shadow-sm">
               <div className="relative flex items-center gap-2 px-3 border-r text-gray-700 text-sm cursor-pointer">
-                ☰ Categories
+                ☰ {selectedCategory}
                 <select
                   className="absolute inset-0 opacity-0 cursor-pointer"
-                  onChange={(e) => handelMenu(e.target.value)}
+                  value=""
+                  onChange={(e) => {
+                    const selectedOption = e.target.options[e.target.selectedIndex];
+                    handelMenu(e.target.value, selectedOption.text);
+                  }}
                 >
                   <option value="0">Categories</option>
                   {category?.map((cat, i) => (

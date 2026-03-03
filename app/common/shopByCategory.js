@@ -79,7 +79,7 @@ function ShopByCategory() {
         {categories.map((category) => (
           <Link
             key={category.id}
-            href={`/category/${category.slug}`}
+            href={`/product/category/${category.slug}`}
             onClick={() => dispatch(categorySlag(category.slug))}
             className="group"
           >

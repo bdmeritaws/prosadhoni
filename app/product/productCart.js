@@ -48,12 +48,12 @@ function ProductCart({ slug, filterType, subCategory }) {
         if (subCategory && subCategory !== "all") {
           // Fetch products by subcategory
           url = AppURL + "product_by_subcategory";
-          bodyData.subcategory_id = subCategory;
+          bodyData.subcategory_id = String(subCategory);
           console.log("Fetching products by subcategory:", subCategory);
         } else {
           // Fetch products by category ID (show all products in category)
           url = AppURL + "product_by_category";
-          bodyData.category_id = slug;
+          bodyData.category_id = String(slug);
           console.log("Fetching all products for category:", slug);
         }
       } else if (slug) {

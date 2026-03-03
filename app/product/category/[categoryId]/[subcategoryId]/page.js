@@ -2,18 +2,36 @@
 import React, { useState, useEffect } from "react";
 import ProductCart from "@/app/product/productCart";
 import Image from "next/image";
+import { useRouter, useParams } from "next/navigation";
 
-function CategoryPage({ params }) {
+function SubCategoryPage() {
+  const router = useRouter();
+  const params = useParams();
+  const categoryId = params?.categoryId;
+  const subcategoryId = params?.subcategoryId;
+  
   const [activeSub, setActiveSub] = useState("all");
   const [subCategories, setSubCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [mainCategoryName, setMainCategoryName] = useState("");
+  const [isReady, setIsReady] = useState(false);
+
+  // ================= UPDATE ACTIVE SUB CATEGORY FROM URL =================
+  useEffect(() => {
+    if (subcategoryId) {
+      setActiveSub(subcategoryId);
+    } else {
+      setActiveSub("all");
+    }
+    // Mark as ready after setting initial state
+    setTimeout(() => setIsReady(true), 100);
+  }, [subcategoryId]);
 
   /* ================= FETCH CATEGORY & SUBCATEGORY ================= */
   useEffect(() => {
     const fetchCategoryData = async () => {
       try {
-        const categoryId = parseInt(params?.categoryId) || 0;
+        const catId = parseInt(categoryId) || 0;
 
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_BASE_URL}subcategory`,
@@ -30,7 +48,7 @@ function CategoryPage({ params }) {
               AuthKey: "Babshahi",
               ContentType: "application/json",
               shop_name: "prosadhoni",
-              main_category_id: categoryId,
+              main_category_id: catId,
             }),
           }
         );
@@ -78,13 +96,23 @@ function CategoryPage({ params }) {
       }
     };
 
-    if (params?.categoryId) {
+    if (categoryId) {
       fetchCategoryData();
     } else {
       setLoading(false);
       setSubCategories([{ id: "all", name: "All", icon: "" }]);
     }
-  }, [params?.categoryId]);
+  }, [categoryId]);
+
+  // ================= HANDLE SUBCATEGORY CLICK =================
+  const handleSubCategoryClick = (subId) => {
+    setActiveSub(subId);
+    if (subId === "all") {
+      router.push(`/product/category/${categoryId}`);
+    } else {
+      router.push(`/product/category/${categoryId}/${subId}`);
+    }
+  };
 
   return (
     <div className="container mx-auto mt-6 px-2">
@@ -105,7 +133,7 @@ function CategoryPage({ params }) {
             subCategories.map((sub) => (
               <button
                 key={sub.id}
-                onClick={() => setActiveSub(sub.id)}
+                onClick={() => handleSubCategoryClick(sub.id)}
                 className={`px-4 py-2 whitespace-nowrap rounded-full border text-sm
                   transition-all duration-300 ease-in-out
                   ${
@@ -147,7 +175,7 @@ function CategoryPage({ params }) {
                 {subCategories.map((sub) => (
                   <div
                     key={sub.id}
-                    onClick={() => setActiveSub(sub.id)}
+                    onClick={() => handleSubCategoryClick(sub.id)}
                     className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer
                       transition-all duration-300 ease-in-out
                       ${
@@ -184,15 +212,29 @@ function CategoryPage({ params }) {
 
         {/* ================= PRODUCT SECTION ================= */}
         <div className="col-span-12 lg:col-span-9">
-          <ProductCart
-            slug={params?.categoryId}
-            filterType="category"
-            subCategory={activeSub}
-          />
+          {!isReady || loading ? (
+            <div className="grid lg:grid-cols-4 grid-cols-2 md:gap-4 gap-2.5">
+              {[...Array(8)].map((_, i) => (
+                <div key={i} className="animate-pulse">
+                  <div className="bg-gray-200 rounded-md h-[200px] md:h-[250px]"></div>
+                  <div className="mt-3 space-y-2">
+                    <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                    <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <ProductCart
+              slug={categoryId}
+              filterType="category"
+              subCategory={activeSub}
+            />
+          )}
         </div>
       </div>
     </div>
   );
 }
 
-export default CategoryPage;
+export default SubCategoryPage;
