@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useRef } from "react";
 import Image from "next/image";
-import { Bag, Person, Search } from "react-bootstrap-icons";
+import { Bag, Person, Search, X } from "react-bootstrap-icons";
 import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
 import { categorySlag, productName } from "@/app/redux/product/productSlice";
@@ -17,95 +17,146 @@ function Menu({ category }) {
   const dispatch = useDispatch();
 
   const cartProduct = useSelector((state) => state.products.productCart);
+
   const [totalCart, setTotalCart] = useState(0);
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("Categories");
-  const inputRef = useRef(null);
+  const [searchResults, setSearchResults] = useState([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
 
-  // ================= UPDATE SELECTED CATEGORY FROM URL =================
-  useEffect(() => {
-    if (pathname.startsWith("/product/category/")) {
-      const categoryId = pathname.split("/")[3];
-      if (categoryId && category !== "0") {
-        const foundCategory = category?.find((cat) => cat.id === categoryId);
-        if (foundCategory) {
-          setSelectedCategory(foundCategory.main_category_name);
-        }
-      }
-    } else {
-      setSelectedCategory("Categories");
-    }
-  }, [pathname, category]);
+  const inputRef = useRef(null);
+  const searchRef = useRef(null);
+  const dropdownRef = useRef(null);
 
   // ================= CART COUNT =================
   useEffect(() => {
     setTotalCart(cartProduct?.length || 0);
   }, [cartProduct]);
 
-  // ================= CLEAR SEARCH WHEN GO HOME =================
+  // ================= CLEAR SEARCH WHEN HOME =================
   useEffect(() => {
     if (pathname === "/") {
       setSearch("");
+      setSearchResults([]);
+      setShowDropdown(false);
     }
   }, [pathname]);
 
-  // ================= AUTO FOCUS ON SEARCH PAGE =================
+  // ================= CLICK OUTSIDE TO CLOSE DROPDOWN =================
   useEffect(() => {
-    if (pathname.startsWith("/search")) {
-      inputRef.current?.focus();
-    }
-  }, [pathname]);
-
-  // ================= DEBOUNCED SEARCH =================
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      if (search.trim().length >= 1) {
-        dispatch(productName(search));
-        router.push(`/search/${search}`);
+    const handleClickOutside = (event) => {
+      if (
+        searchRef.current && 
+        !searchRef.current.contains(event.target) &&
+        !dropdownRef.current?.contains(event.target)
+      ) {
+        setShowDropdown(false);
       }
-    }, 500);
+    };
 
-    return () => clearTimeout(timeoutId);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  // ================= BODY SCROLL LOCK (Mobile only) =================
+  useEffect(() => {
+    if (showDropdown && window.innerWidth < 768) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [showDropdown]);
+
+  // ================= LIVE SEARCH =================
+  useEffect(() => {
+    const fetchSearchResults = async () => {
+      const searchTerm = search.trim();
+
+      if (searchTerm.length < 2) {
+        setSearchResults([]);
+        return;
+      }
+
+      setIsSearching(true);
+
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_BASE_URL}product_by_name`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              ClientService: "frontend-client",
+              AuthKey: "Babshahi",
+              ContentType: "application/json",
+              shop_name: "prosadhoni",
+              product_name: searchTerm,
+            }),
+          }
+        );
+
+        const data = await response.json();
+        const products = data?.products || [];
+        setSearchResults(products.slice(0, 8));
+        setShowDropdown(true);
+      } catch (error) {
+        console.error("Search error:", error);
+      } finally {
+        setIsSearching(false);
+      }
+    };
+
+    const debounce = setTimeout(fetchSearchResults, 400);
+    return () => clearTimeout(debounce);
   }, [search]);
 
   const handleSearch = () => {
-    if (search.trim().length >= 1) {
+    if (search.trim()) {
       dispatch(productName(search));
       router.push(`/search/${search}`);
+      setShowDropdown(false);
     }
   };
 
-  const handelMenu = (id, name = "Categories") => {
+  const handleResultClick = (slug) => {
+    router.push(`/product/${slug}`);
+    setShowDropdown(false);
+    setSearch("");
+  };
+
+  const handleCategoryChange = (id, name = "Categories") => {
     setSelectedCategory(name);
     dispatch(categorySlag(id));
-    router.push(id === "0" ? "/" : `/product/category/${id}`);
+    if (id === "0") {
+      router.push("/");
+    } else {
+      router.push(`/product/category/${id}`);
+    }
   };
 
   return (
-    <header className="sticky top-0 z-50">
-      {/* ================= MOBILE VIEW ================= */}
+    <header className="sticky top-0 z-[100] overflow-visible">
+
+      {/* ================= MOBILE ================= */}
       <div className="md:hidden">
         {/* Top Bar */}
         <div className="bg-[#8F2C8C] h-14 flex items-center justify-between px-4">
           <Link href="/" className="flex items-center gap-2">
-            <Image
-              src={LOGO_URL}
-              alt="Prosadhoni Logo"
-              width={32}
-              height={32}
-              className="object-contain"
-              priority
-            />
-            <span className="text-white text-lg font-semibold tracking-wide">
-              Prosadhoni
-            </span>
+            <Image src={LOGO_URL} alt="Logo" width={32} height={32} />
+            <span className="text-white font-semibold">Prosadhoni</span>
           </Link>
 
           <div className="flex items-center gap-4 text-white">
             <Link href="/account">
               <Person size={22} />
             </Link>
-
             <Link href="/cart" className="relative">
               <Bag size={22} />
               <span className="absolute -top-2 -right-2 bg-red-600 text-xs w-5 h-5 flex items-center justify-center rounded-full">
@@ -115,128 +166,296 @@ function Menu({ category }) {
           </div>
         </div>
 
-        {/* Categories + Search */}
-        <div className="bg-white px-3 py-3 shadow-sm">
+        {/* Search Bar */}
+        <div className="bg-white px-3 py-3 shadow-sm" ref={searchRef}>
           <div className="flex items-center gap-2">
-            <div className="relative w-[120px] flex-shrink-0">
-              <div className="flex items-center justify-center gap-1 h-11 bg-gray-100 rounded-md text-sm font-medium text-gray-700 px-2">
+            {/* Category Dropdown */}
+            <div className="relative w-[100px] flex-shrink-0">
+              <div className="flex items-center justify-center h-11 bg-gray-100 rounded-lg text-sm font-medium px-2 truncate">
                 ☰ {selectedCategory}
               </div>
 
               <select
                 className="absolute inset-0 opacity-0 cursor-pointer w-full"
-                value=""
                 onChange={(e) => {
-                  const selectedOption = e.target.options[e.target.selectedIndex];
-                  handelMenu(e.target.value, selectedOption.text);
+                  const option = e.target.options[e.target.selectedIndex];
+                  handleCategoryChange(e.target.value, option.text);
                 }}
+                value=""
               >
                 <option value="0">Categories</option>
-                {category?.map((cat, i) => (
-                  <option key={i} value={cat.id}>
+                {category?.map((cat) => (
+                  <option key={cat.id} value={cat.id}>
                     {cat.main_category_name}
                   </option>
                 ))}
               </select>
             </div>
 
-            {/* Search */}
-            <div className="flex flex-1 h-11 bg-gray-100 rounded-md overflow-hidden">
-              <input
-                ref={inputRef}
-                type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search products"
-                className="flex-1 px-3 bg-transparent outline-none text-sm text-gray-700 min-w-0"
-              />
+            {/* Search Input */}
+            <div className="flex-1 relative">
+              <div className="flex h-11 bg-gray-100 rounded-lg overflow-hidden">
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={search}
+                  onFocus={() => search.length >= 2 && setShowDropdown(true)}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Search products..."
+                  className="flex-1 px-3 bg-transparent outline-none text-sm"
+                  onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                />
 
-              <button
-                onClick={handleSearch}
-                className="px-4 bg-[#6F1D6C] text-white flex items-center justify-center flex-shrink-0"
-              >
-                <Search size={18} />
-              </button>
+                <button
+                  onClick={handleSearch}
+                  className="px-4 bg-[#6F1D6C] text-white"
+                >
+                  <Search size={18} />
+                </button>
+              </div>
+
+              {/* Loading Indicator */}
+              {isSearching && (
+                <div className="absolute right-14 top-3">
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#8F2C8C]"></div>
+                </div>
+              )}
             </div>
           </div>
         </div>
+
+        {/* MOBILE SEARCH RESULTS OVERLAY */}
+        {showDropdown && (
+          <div 
+            ref={dropdownRef}
+            className="fixed left-0 right-0 top-[112px] bottom-0 bg-white z-[9999] overflow-y-auto shadow-xl"
+          >
+            {/* Header with close button */}
+            <div className="sticky top-0 bg-white border-b p-3 flex justify-between items-center">
+              <h3 className="font-semibold text-gray-700">
+                {searchResults.length} products found
+              </h3>
+              <button 
+                onClick={() => setShowDropdown(false)}
+                className="p-1 hover:bg-gray-100 rounded-full"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Results */}
+            <div className="p-2">
+              {isSearching ? (
+                <div className="text-center py-8 text-gray-500">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#8F2C8C] mx-auto mb-2"></div>
+                  <p>Searching...</p>
+                </div>
+              ) : searchResults.length > 0 ? (
+                <>
+                  {searchResults.map((product) => (
+                    <div
+                      key={product.id}
+                      onClick={() => handleResultClick(product.slag_name)}
+                      className="flex items-center gap-3 p-3 border-b hover:bg-gray-50 cursor-pointer transition-colors"
+                    >
+                      <img
+                        src={product.product_image}
+                        alt={product.product_name}
+                        className="w-16 h-16 object-contain rounded-lg bg-gray-100"
+                        onError={(e) => {
+                          e.target.src = "https://via.placeholder.com/64";
+                        }}
+                      />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-800 line-clamp-2">
+                          {product.product_name}
+                        </p>
+                        <p className="text-[#8F2C8C] font-bold text-base mt-1">
+                          ৳{product.sales_price}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+
+                  <div
+                    onClick={handleSearch}
+                    className="p-4 text-center text-sm text-[#8F2C8C] font-medium border-t cursor-pointer hover:bg-gray-50 transition-colors"
+                  >
+                    View all results for "<span className="font-bold">{search}</span>"
+                  </div>
+                </>
+              ) : search.length >= 2 ? (
+                <div className="text-center py-8 text-gray-500">
+                  <p className="text-lg mb-2">😕</p>
+                  <p>No products found for "{search}"</p>
+                  <p className="text-sm mt-2">Try checking your spelling or use a different word</p>
+                </div>
+              ) : (
+                <div className="text-center py-8 text-gray-500">
+                  <p>Type at least 2 characters to search</p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* ================= DESKTOP VIEW ================= */}
+      {/* ================= DESKTOP ================= */}
       <div className="hidden md:block bg-[#8F2C8C] shadow-md">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-center justify-between h-[64px]">
+            {/* Logo */}
             <Link href="/" className="flex items-center gap-3">
-              <Image
-                src={LOGO_URL}
-                alt="Prosadhoni Logo"
-                width={40}
-                height={40}
-                className="object-contain"
-                priority
-              />
-              <span className="text-xl font-semibold tracking-wide text-white">
+              <Image src={LOGO_URL} alt="Logo" width={40} height={40} />
+              <span className="text-white text-xl font-semibold">
                 Prosadhoni
               </span>
             </Link>
 
-            {/* Search Area */}
-            <div className="flex items-center bg-white rounded-md overflow-hidden w-[560px] h-[40px] shadow-sm">
-              <div className="relative flex items-center gap-2 px-3 border-r text-gray-700 text-sm cursor-pointer">
-                ☰ {selectedCategory}
-                <select
-                  className="absolute inset-0 opacity-0 cursor-pointer"
-                  value=""
-                  onChange={(e) => {
-                    const selectedOption = e.target.options[e.target.selectedIndex];
-                    handelMenu(e.target.value, selectedOption.text);
-                  }}
+            {/* Desktop Search with Live Results */}
+            <div ref={searchRef} className="relative">
+              <div className="flex items-center bg-white rounded-lg w-[500px] lg:w-[560px] h-[44px]">
+                {/* Category Dropdown */}
+                <div className="relative h-full">
+                  <div className="flex items-center gap-2 px-3 lg:px-4 h-full border-r text-gray-700 text-sm cursor-pointer whitespace-nowrap">
+                    ☰ {selectedCategory}
+                  </div>
+                  <select
+                    className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                    onChange={(e) => {
+                      const option = e.target.options[e.target.selectedIndex];
+                      handleCategoryChange(e.target.value, option.text);
+                    }}
+                    value=""
+                  >
+                    <option value="0">Categories</option>
+                    {category?.map((cat) => (
+                      <option key={cat.id} value={cat.id}>
+                        {cat.main_category_name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Search Input */}
+                <div className="relative flex-1">
+                  <input
+                    ref={inputRef}
+                    type="text"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    onFocus={() => search.length >= 2 && setShowDropdown(true)}
+                    placeholder="Search products..."
+                    className="flex-1 px-3 lg:px-4 text-sm outline-none w-full h-[44px]"
+                    onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                  />
+
+                  {/* Loading / Clear */}
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                    {isSearching ? (
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#8F2C8C]"></div>
+                    ) : search ? (
+                      <button 
+                        onClick={() => { 
+                          setSearch(""); 
+                          setSearchResults([]); 
+                          inputRef.current?.focus();
+                        }} 
+                        className="text-gray-400 hover:text-gray-600"
+                      >
+                        <X size={18} />
+                      </button>
+                    ) : null}
+                  </div>
+
+                  {/* Desktop Search Dropdown */}
+                  {showDropdown && (
+                    <div 
+                      ref={dropdownRef}
+                      className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-xl z-[9999] max-h-96 overflow-y-auto mt-1"
+                    >
+                      {isSearching ? (
+                        <div className="p-4 text-center text-sm text-gray-500">
+                          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#8F2C8C] mx-auto mb-2"></div>
+                          <p>Searching...</p>
+                        </div>
+                      ) : searchResults.length > 0 ? (
+                        <>
+                          {searchResults.map((product) => (
+                            <div
+                              key={product.id}
+                              onClick={() => handleResultClick(product.slag_name)}
+                              className="flex items-center gap-3 p-3 hover:bg-gray-50 cursor-pointer transition-colors border-b last:border-b-0"
+                            >
+                              <img
+                                src={product.product_image}
+                                alt={product.product_name}
+                                className="w-12 h-12 object-contain rounded-lg bg-gray-100"
+                                onError={(e) => {
+                                  e.target.src = "https://via.placeholder.com/48";
+                                }}
+                              />
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm text-gray-800 truncate font-medium">
+                                  {product.product_name}
+                                </p>
+                                <p className="text-sm text-[#8F2C8C] font-bold">
+                                  ৳{product.sales_price}
+                                </p>
+                              </div>
+                            </div>
+                          ))}
+                          <div
+                            onClick={handleSearch}
+                            className="p-3 text-center text-sm text-[#8F2C8C] hover:bg-gray-50 cursor-pointer font-medium border-t"
+                          >
+                            View all results for "<span className="font-bold">{search}</span>"
+                          </div>
+                        </>
+                      ) : search.length >= 2 ? (
+                        <div className="p-4 text-center text-sm text-gray-500">
+                          <p className="mb-1">No products found for "{search}"</p>
+                          <p className="text-xs text-gray-400">Try a different search term</p>
+                        </div>
+                      ) : (
+                        <div className="p-4 text-center text-sm text-gray-500">
+                          Type at least 2 characters to search
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {/* Search Button */}
+                <button
+                  onClick={handleSearch}
+                  className="px-4 lg:px-6 bg-[#6F1D6C] text-white h-full rounded-r-lg flex items-center gap-1 hover:bg-[#5a1757] transition-colors"
                 >
-                  <option value="0">Categories</option>
-                  {category?.map((cat, i) => (
-                    <option key={i} value={cat.id}>
-                      {cat.main_category_name}
-                    </option>
-                  ))}
-                </select>
+                  <Search size={16} />
+                  <span className="hidden lg:inline">Search</span>
+                </button>
               </div>
-
-              <input
-                ref={inputRef}
-                type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder='Search for "beauty products"'
-                className="flex-1 h-full px-3 text-sm text-gray-700 outline-none"
-              />
-
-              <button
-                onClick={handleSearch}
-                className="h-full px-4 bg-[#6F1D6C] text-white flex items-center gap-1 text-sm"
-              >
-                <Search size={14} />
-                Search
-              </button>
             </div>
 
+            {/* Cart & Account */}
             <div className="flex items-center gap-3">
-              <Link
-                href="/cart"
-                className="relative flex items-center gap-2 bg-white text-[#8F2C8C] px-4 h-[36px] rounded-md text-sm font-medium"
-              >
-                <Bag size={16} />
-                My Cart
-                <span className="absolute -top-2 -right-2 bg-green-600 text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full">
-                  {totalCart}
-                </span>
+              <Link href="/cart" className="relative">
+                <div className="bg-white px-4 h-[36px] flex items-center rounded-md text-[#8F2C8C] hover:bg-gray-100 transition-colors">
+                  <Bag size={16} />
+                  <span className="ml-2 font-medium">{totalCart}</span>
+                </div>
+                {totalCart > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-green-600 text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full">
+                    {totalCart > 9 ? '9+' : totalCart}
+                  </span>
+                )}
               </Link>
 
-              <Link
-                href="/account"
-                className="flex items-center gap-2 bg-white text-[#8F2C8C] px-4 h-[36px] rounded-md text-sm font-medium"
-              >
-                <Person size={16} />
-                Account
+              <Link href="/account">
+                <div className="bg-white px-4 h-[36px] flex items-center rounded-md text-[#8F2C8C] hover:bg-gray-100 transition-colors">
+                  <Person size={16} />
+                  <span className="ml-2 hidden lg:inline">Account</span>
+                </div>
               </Link>
             </div>
           </div>
