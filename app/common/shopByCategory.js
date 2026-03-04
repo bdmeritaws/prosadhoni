@@ -5,48 +5,49 @@ import Link from "next/link";
 import { useDispatch } from "react-redux";
 import { categorySlag } from "@/app/redux/product/productSlice";
 
+// Static category data with images - using category name as slug
 const categories = [
   {
     id: 1,
     name: "Skincare",
     image:
       "https://babshahi.s3.ap-south-1.amazonaws.com/category/skincare.webp",
-    slug: "22",
+    slug: "skincare",
   },
   {
     id: 2,
     name: "Haircare",
     image:
       "https://babshahi.s3.ap-south-1.amazonaws.com/category/haircare.webp",
-    slug: "23",
+    slug: "haircare",
   },
   {
     id: 3,
     name: "Personal Care",
     image:
       "https://babshahi.s3.ap-south-1.amazonaws.com/category/personal-care.webp",
-    slug: "27",
+    slug: "personal-care",
   },
   {
     id: 4,
     name: "Men's Grooming",
     image:
       "https://babshahi.s3.ap-south-1.amazonaws.com/category/men’s-grooming.webp",
-    slug: "25",
+    slug: "mens-grooming",
   },
   {
     id: 5,
     name: "Fragrance & Perfume",
     image:
       "https://babshahi.s3.ap-south-1.amazonaws.com/category/fragrance-&-perfume.webp",
-    slug: "26",
+    slug: "fragrance-perfume",
   },
   {
     id: 6,
     name: "Makeup",
     image:
       "https://babshahi.s3.ap-south-1.amazonaws.com/category/makeup.webp",
-    slug: "134",
+    slug: "makeup",
   },
   {
     id: 7,
@@ -60,7 +61,7 @@ const categories = [
     name: "Beauty Tools & Device",
     image:
       "https://babshahi.s3.ap-south-1.amazonaws.com/category/beauty-tools-&-device.webp",
-    slug: "135",
+    slug: "beauty-tools",
   },
 ];
 

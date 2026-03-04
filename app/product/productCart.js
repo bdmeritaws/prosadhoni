@@ -7,6 +7,7 @@ import AddToCart from "@/app/common/addToCart";
 import { useSelector } from "react-redux";
 import noResultFound from "../../public/No-Result-Found.jpg";
 import Image from "next/image";
+import { getCategoryProducts, getSubcategoryProducts } from "@/app/utils/api";
 
 function ProductCart({ slug, filterType, subCategory }) {
   const AppURL = process.env.NEXT_PUBLIC_BASE_URL;
@@ -26,71 +27,121 @@ function ProductCart({ slug, filterType, subCategory }) {
     try {
       setIsLoading(true);
 
-      let url = "";
-      let bodyData = {
-        ClientService: "frontend-client",
-        AuthKey: "Babshahi",
-        ContentType: "application/json",
-        shop_name: "prosadhoni",
-        page: page,
-        limit: itemsPerPage,
-      };
+      let result;
 
       // Handle filter type (top_deals, under_99, category)
       if (filterType === "top_deals") {
-        url = AppURL + "product_top_deal";
-        bodyData.category_id = "";
+        // Use existing API for top deals
+        const response = await fetch(`${AppURL}product_top_deal`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Origin": typeof window !== 'undefined' ? window.location.origin : "https://babshahi.com",
+            "Referer": typeof window !== 'undefined' ? window.location.href : "https://babshahi.com",
+          },
+          body: JSON.stringify({
+            ClientService: "frontend-client",
+            AuthKey: "Babshahi",
+            ContentType: "application/json",
+            shop_name: "prosadhoni",
+            category_id: "",
+            page,
+            limit: itemsPerPage,
+          }),
+          cache: "no-store",
+        });
+        result = await response.json();
       } else if (filterType === "under_99") {
-        url = AppURL + "product_under_99";
-        bodyData.category_id = "";
+        // Use existing API for under 99
+        const response = await fetch(`${AppURL}product_under_99`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Origin": typeof window !== 'undefined' ? window.location.origin : "https://babshahi.com",
+            "Referer": typeof window !== 'undefined' ? window.location.href : "https://babshahi.com",
+          },
+          body: JSON.stringify({
+            ClientService: "frontend-client",
+            AuthKey: "Babshahi",
+            ContentType: "application/json",
+            shop_name: "prosadhoni",
+            category_id: "",
+            page,
+            limit: itemsPerPage,
+          }),
+          cache: "no-store",
+        });
+        result = await response.json();
       } else if (filterType === "category") {
         // Check if subcategory is selected (not "all")
         if (subCategory && subCategory !== "all") {
-          // Fetch products by subcategory
-          url = AppURL + "product_by_subcategory";
-          bodyData.subcategory_id = String(subCategory);
+          // Fetch products by subcategory using new API
           console.log("Fetching products by subcategory:", subCategory);
+          const apiResult = await getSubcategoryProducts(subCategory, page, itemsPerPage);
+          result = apiResult.data || {};
         } else {
-          // Fetch products by category ID (show all products in category)
-          url = AppURL + "product_by_category";
-          bodyData.category_id = String(slug);
-          console.log("Fetching all products for category:", slug);
+          // Fetch products by category ID using new API
+          // Use slug as category_id when it's numeric
+          const categoryId = /^[0-9]+$/.test(slug) ? slug : null;
+          console.log("Fetching all products for category:", categoryId || slug);
+          const apiResult = await getCategoryProducts(categoryId || slug, page, itemsPerPage);
+          result = apiResult.data || {};
         }
       } else if (slug) {
-        // 🔥 Check if slug is numeric (category ID) or string (search text)
+        // Check if slug is numeric (category ID) or string (search text)
         const isCategoryId = /^[0-9]+$/.test(slug);
         if (isCategoryId) {
-          // Category ID - fetch products by category
-          url = AppURL + "product_by_category";
-          bodyData.category_id = slug;
+          // Category ID - fetch products by category using new API
+          const apiResult = await getCategoryProducts(slug, page, itemsPerPage);
+          result = apiResult.data || {};
         } else {
-          // Search text - fetch products by name
-          url = AppURL + "product_by_name";
-          bodyData.product_name = slug;
+          // Search text - fetch products by name using existing API
+          const response = await fetch(`${AppURL}product_by_name`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Origin": typeof window !== 'undefined' ? window.location.origin : "https://babshahi.com",
+              "Referer": typeof window !== 'undefined' ? window.location.href : "https://babshahi.com",
+            },
+            body: JSON.stringify({
+              ClientService: "frontend-client",
+              AuthKey: "Babshahi",
+              ContentType: "application/json",
+              shop_name: "prosadhoni",
+              product_name: slug,
+              page,
+              limit: itemsPerPage,
+            }),
+            cache: "no-store",
+          });
+          result = await response.json();
         }
       } else {
-        url = AppURL + "product";
-        bodyData.category_id = categoryId || 0;
+        // Default product list
+        const response = await fetch(`${AppURL}product`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Origin": typeof window !== 'undefined' ? window.location.origin : "https://babshahi.com",
+            "Referer": typeof window !== 'undefined' ? window.location.href : "https://babshahi.com",
+          },
+          body: JSON.stringify({
+            ClientService: "frontend-client",
+            AuthKey: "Babshahi",
+            ContentType: "application/json",
+            shop_name: "prosadhoni",
+            category_id: categoryId || 0,
+          }),
+          cache: "no-store",
+        });
+        result = await response.json();
       }
 
-      const response = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Origin": typeof window !== 'undefined' ? window.location.origin : "https://babshahi.com",
-          "Referer": typeof window !== 'undefined' ? window.location.href : "https://babshahi.com",
-        },
-        body: JSON.stringify(bodyData),
-        cache: "no-store",
-      });
+      setProducts(result?.products || []);
 
-      const res = await response.json();
-
-      setProducts(res?.products || []);
-
-      if (res?.total) {
-        setTotalPages(Math.ceil(res.total / itemsPerPage));
-      } else if (res?.products?.length) {
+      if (result?.total) {
+        setTotalPages(Math.ceil(result.total / itemsPerPage));
+      } else if (result?.products?.length) {
         setTotalPages(1);
       } else {
         setTotalPages(1);

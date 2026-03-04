@@ -55,14 +55,14 @@ function Menu({ category }) {
       // Determine which dropdown is active based on screen size
       const activeDropdown = window.innerWidth < 768 ? mobileDropdownRef.current : desktopDropdownRef.current;
       const activeCategory = window.innerWidth < 768 ? mobileCategoryRef.current : desktopCategoryRef.current;
-      
+
       // Don't close if clicking on category select (native dropdown)
       if (event.target.tagName === 'SELECT' || event.target.tagName === 'OPTION') {
         return;
       }
-      
+
       if (
-        searchRef.current && 
+        searchRef.current &&
         !searchRef.current.contains(event.target) &&
         activeDropdown &&
         !activeDropdown.contains(event.target) &&
@@ -76,7 +76,7 @@ function Menu({ category }) {
     // Support both mouse and touch events for mobile
     document.addEventListener("mousedown", handleClickOutside);
     document.addEventListener("touchstart", handleClickOutside);
-    
+
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
       document.removeEventListener("touchstart", handleClickOutside);
@@ -160,11 +160,14 @@ function Menu({ category }) {
     console.log('[DEBUG] handleCategoryChange called:', id, name);
     setSelectedCategory(name);
     setShowDropdown(false); // Close search dropdown when category is selected
+
+    // Convert name to slug for the URL
+    const slug = id === "0" ? "0" : (name || "").toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
     dispatch(categorySlag(id));
     if (id === "0") {
       router.push("/");
     } else {
-      router.push(`/product/category/${id}`);
+      router.push(`/product/category/${slug}`);
     }
   };
 
@@ -262,7 +265,7 @@ function Menu({ category }) {
 
         {/* MOBILE SEARCH RESULTS OVERLAY */}
         {showDropdown && (
-          <div 
+          <div
             ref={mobileDropdownRef}
             className="fixed left-0 right-0 top-[112px] bottom-0 bg-white z-[9999] overflow-y-auto shadow-xl"
           >
@@ -271,7 +274,7 @@ function Menu({ category }) {
               <h3 className="font-semibold text-gray-700">
                 {searchResults.length} products found
               </h3>
-              <button 
+              <button
                 onPointerUp={(e) => {
                   if (e.pointerType) {
                     setShowDropdown(false);
@@ -323,16 +326,19 @@ function Menu({ category }) {
                     </Link>
                   ))}
 
-                  <Link
-                    href={`/search/${search}`}
-                    onClick={() => {
-                      setShowDropdown(false);
-                      setSearch("");
-                    }}
-                    className="p-4 text-center text-sm text-[#8F2C8C] font-medium border-t cursor-pointer hover:bg-gray-50 transition-colors"
-                  >
-                    View all results for "<span className="font-bold">{search}</span>"
-                  </Link>
+                  <div className="border-t mt-2">
+                    <Link
+                      href={`/search/${search}`}
+                      onClick={() => {
+                        setShowDropdown(false);
+                        setSearch("");
+                      }}
+                      className="flex items-center justify-center gap-1 py-4 text-[15px] font-medium text-[#8F2C8C] hover:bg-gray-50"
+                    >
+                      <span className="text-gray-600">View all results for</span>
+                      <span className="font-bold text-[#8F2C8C]">"{search}"</span>
+                    </Link>
+                  </div>
                 </>
               ) : search.length >= 2 ? (
                 <div className="text-center py-8 text-gray-500">
@@ -412,12 +418,12 @@ function Menu({ category }) {
                     {isSearching ? (
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#8F2C8C]"></div>
                     ) : search ? (
-                      <button 
-                        onClick={() => { 
-                          setSearch(""); 
-                          setSearchResults([]); 
+                      <button
+                        onClick={() => {
+                          setSearch("");
+                          setSearchResults([]);
                           inputRef.current?.focus();
-                        }} 
+                        }}
                         className="text-gray-400 hover:text-gray-600"
                       >
                         <X size={18} />
@@ -427,7 +433,7 @@ function Menu({ category }) {
 
                   {/* Desktop Search Dropdown */}
                   {showDropdown && (
-                    <div 
+                    <div
                       ref={desktopDropdownRef}
                       className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-xl z-[9999] max-h-96 overflow-y-auto mt-1"
                     >
@@ -464,9 +470,9 @@ function Menu({ category }) {
                           ))}
                           <div
                             onClick={handleSearch}
-                            className="p-3 text-center text-sm text-[#8F2C8C] hover:bg-gray-50 cursor-pointer font-medium border-t"
+                            className="p-4 text-center text-sm text-[#8F2C8C] hover:bg-gray-50 cursor-pointer font-medium border-t"
                           >
-                            View all results for "<span className="font-bold">{search}</span>"
+                            View all results for <span className="font-bold">{search}</span>
                           </div>
                         </>
                       ) : search.length >= 2 ? (
@@ -498,8 +504,8 @@ function Menu({ category }) {
             <div className="flex items-center gap-3">
               <Link href="/cart" className="relative">
                 <div className="bg-white px-4 h-[36px] flex items-center rounded-md text-[#8F2C8C] hover:bg-gray-100 transition-colors">
-                  <Bag size={16} />
-                  <span className="ml-2 font-medium">{totalCart}</span>
+                  <Bag size={16} /> 
+                  <span className="ml-2 font-medium">Cart {totalCart}</span>
                 </div>
                 {totalCart > 0 && (
                   <span className="absolute -top-2 -right-2 bg-green-600 text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full">

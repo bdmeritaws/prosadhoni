@@ -211,7 +211,7 @@ function CartBody({ productId }) {
                     </div>
 
                     {/* Delivery Selection */}
-                    <div className="mt-6 border rounded-md text-sm">
+                    {/* <div className="mt-6 border rounded-md text-sm">
                         <div
                             onClick={() => setDeliveryCharge(60)}
                             className={`flex justify-between p-2 cursor-pointer ${deliveryCharge === 60 ? "bg-purple-50" : ""
@@ -229,7 +229,7 @@ function CartBody({ productId }) {
                             <span>ঢাকার বাহিরে</span>
                             <span>৳ 120</span>
                         </div>
-                    </div>
+                    </div> */}
 
                     {/* Contact Buttons */}
                     <div className="mt-6 space-y-3">
