@@ -128,9 +128,9 @@ function ModalOrderConfirmed(props) {
     return (
         <div>
             {checkModal ?
-                <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center px-3">
+                <div className="fixed inset-0 z-[99999] bg-black/50 flex items-end md:items-center justify-center overflow-hidden">
                     <div
-                        className="bg-white w-full max-w-md rounded-2xl shadow-2xl p-6 relative max-h-[95vh] overflow-y-auto">
+                        className="bg-white w-full md:w-full md:max-w-md rounded-t-2xl md:rounded-2xl shadow-2xl p-4 md:p-6 relative h-[85dvh] md:h-auto md:max-h-[90vh] overflow-y-auto mt-16 md:mt-0">
 
                         {/* Close Button */}
                         <button

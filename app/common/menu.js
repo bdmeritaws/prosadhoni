@@ -27,7 +27,11 @@ function Menu({ category }) {
 
   const inputRef = useRef(null);
   const searchRef = useRef(null);
-  const dropdownRef = useRef(null);
+  const mobileDropdownRef = useRef(null);
+  const desktopDropdownRef = useRef(null);
+
+  // Helper to check if we're on mobile
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
 
   // ================= CART COUNT =================
   useEffect(() => {
@@ -46,18 +50,26 @@ function Menu({ category }) {
   // ================= CLICK OUTSIDE TO CLOSE DROPDOWN =================
   useEffect(() => {
     const handleClickOutside = (event) => {
+      // Determine which dropdown is active based on screen size
+      const activeDropdown = window.innerWidth < 768 ? mobileDropdownRef.current : desktopDropdownRef.current;
+      
       if (
         searchRef.current && 
         !searchRef.current.contains(event.target) &&
-        !dropdownRef.current?.contains(event.target)
+        activeDropdown &&
+        !activeDropdown.contains(event.target)
       ) {
         setShowDropdown(false);
       }
     };
 
+    // Support both mouse and touch events for mobile
     document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("touchend", handleClickOutside);
+    
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchend", handleClickOutside);
     };
   }, []);
 
@@ -126,6 +138,9 @@ function Menu({ category }) {
   };
 
   const handleResultClick = (slug) => {
+    console.log('[DEBUG handleResultClick] Called with slug:', slug);
+    console.log('[DEBUG handleResultClick] Current showDropdown:', showDropdown);
+    console.log('[DEBUG handleResultClick] Current search:', search);
     router.push(`/product/${slug}`);
     setShowDropdown(false);
     setSearch("");
@@ -227,7 +242,7 @@ function Menu({ category }) {
         {/* MOBILE SEARCH RESULTS OVERLAY */}
         {showDropdown && (
           <div 
-            ref={dropdownRef}
+            ref={mobileDropdownRef}
             className="fixed left-0 right-0 top-[112px] bottom-0 bg-white z-[9999] overflow-y-auto shadow-xl"
           >
             {/* Header with close button */}
@@ -236,7 +251,12 @@ function Menu({ category }) {
                 {searchResults.length} products found
               </h3>
               <button 
-                onClick={() => setShowDropdown(false)}
+                onPointerUp={(e) => {
+                  if (e.pointerType) {
+                    setShowDropdown(false);
+                  }
+                }}
+                style={{ touchAction: 'manipulation' }}
                 className="p-1 hover:bg-gray-100 rounded-full"
               >
                 <X size={20} />
@@ -253,9 +273,14 @@ function Menu({ category }) {
               ) : searchResults.length > 0 ? (
                 <>
                   {searchResults.map((product) => (
-                    <div
+                    <Link
                       key={product.id}
-                      onClick={() => handleResultClick(product.slag_name)}
+                      href={`/product/${product.slag_name}`}
+                      onClick={() => {
+                        setShowDropdown(false);
+                        setSearch("");
+                      }}
+                      style={{ touchAction: 'manipulation' }}
                       className="flex items-center gap-3 p-3 border-b hover:bg-gray-50 cursor-pointer transition-colors"
                     >
                       <img
@@ -274,15 +299,19 @@ function Menu({ category }) {
                           ৳{product.sales_price}
                         </p>
                       </div>
-                    </div>
+                    </Link>
                   ))}
 
-                  <div
-                    onClick={handleSearch}
+                  <Link
+                    href={`/search/${search}`}
+                    onClick={() => {
+                      setShowDropdown(false);
+                      setSearch("");
+                    }}
                     className="p-4 text-center text-sm text-[#8F2C8C] font-medium border-t cursor-pointer hover:bg-gray-50 transition-colors"
                   >
                     View all results for "<span className="font-bold">{search}</span>"
-                  </div>
+                  </Link>
                 </>
               ) : search.length >= 2 ? (
                 <div className="text-center py-8 text-gray-500">
@@ -371,7 +400,7 @@ function Menu({ category }) {
                   {/* Desktop Search Dropdown */}
                   {showDropdown && (
                     <div 
-                      ref={dropdownRef}
+                      ref={desktopDropdownRef}
                       className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-xl z-[9999] max-h-96 overflow-y-auto mt-1"
                     >
                       {isSearching ? (
