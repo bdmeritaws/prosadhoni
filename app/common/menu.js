@@ -29,6 +29,8 @@ function Menu({ category }) {
   const searchRef = useRef(null);
   const mobileDropdownRef = useRef(null);
   const desktopDropdownRef = useRef(null);
+  const mobileCategoryRef = useRef(null);
+  const desktopCategoryRef = useRef(null);
 
   // Helper to check if we're on mobile
   const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
@@ -52,12 +54,20 @@ function Menu({ category }) {
     const handleClickOutside = (event) => {
       // Determine which dropdown is active based on screen size
       const activeDropdown = window.innerWidth < 768 ? mobileDropdownRef.current : desktopDropdownRef.current;
+      const activeCategory = window.innerWidth < 768 ? mobileCategoryRef.current : desktopCategoryRef.current;
+      
+      // Don't close if clicking on category select (native dropdown)
+      if (event.target.tagName === 'SELECT' || event.target.tagName === 'OPTION') {
+        return;
+      }
       
       if (
         searchRef.current && 
         !searchRef.current.contains(event.target) &&
         activeDropdown &&
-        !activeDropdown.contains(event.target)
+        !activeDropdown.contains(event.target) &&
+        activeCategory &&
+        !activeCategory.contains(event.target)
       ) {
         setShowDropdown(false);
       }
@@ -65,11 +75,11 @@ function Menu({ category }) {
 
     // Support both mouse and touch events for mobile
     document.addEventListener("mousedown", handleClickOutside);
-    document.addEventListener("touchend", handleClickOutside);
+    document.addEventListener("touchstart", handleClickOutside);
     
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
-      document.removeEventListener("touchend", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
     };
   }, []);
 
@@ -147,7 +157,9 @@ function Menu({ category }) {
   };
 
   const handleCategoryChange = (id, name = "Categories") => {
+    console.log('[DEBUG] handleCategoryChange called:', id, name);
     setSelectedCategory(name);
+    setShowDropdown(false); // Close search dropdown when category is selected
     dispatch(categorySlag(id));
     if (id === "0") {
       router.push("/");
@@ -185,14 +197,23 @@ function Menu({ category }) {
         <div className="bg-white px-3 py-3 shadow-sm" ref={searchRef}>
           <div className="flex items-center gap-2">
             {/* Category Dropdown */}
-            <div className="relative w-[100px] flex-shrink-0">
+            <div className="relative w-[100px] flex-shrink-0" ref={mobileCategoryRef}>
               <div className="flex items-center justify-center h-11 bg-gray-100 rounded-lg text-sm font-medium px-2 truncate">
                 ☰ {selectedCategory}
               </div>
 
               <select
-                className="absolute inset-0 opacity-0 cursor-pointer w-full"
+                className="absolute inset-0 opacity-0 cursor-pointer w-full z-10"
+                onClick={(e) => {
+                  console.log('[DEBUG] Mobile select onClick:', e.target.value);
+                  const select = e.target;
+                  if (select.value && select.value !== '0') {
+                    const option = select.options[select.selectedIndex];
+                    handleCategoryChange(select.value, option.text);
+                  }
+                }}
                 onChange={(e) => {
+                  console.log('[DEBUG] Mobile select onChange:', e.target.value);
                   const option = e.target.options[e.target.selectedIndex];
                   handleCategoryChange(e.target.value, option.text);
                 }}
@@ -345,12 +366,19 @@ function Menu({ category }) {
             <div ref={searchRef} className="relative">
               <div className="flex items-center bg-white rounded-lg w-[500px] lg:w-[560px] h-[44px]">
                 {/* Category Dropdown */}
-                <div className="relative h-full">
+                <div className="relative h-full" ref={desktopCategoryRef}>
                   <div className="flex items-center gap-2 px-3 lg:px-4 h-full border-r text-gray-700 text-sm cursor-pointer whitespace-nowrap">
                     ☰ {selectedCategory}
                   </div>
                   <select
-                    className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                    className="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-10"
+                    onClick={(e) => {
+                      const select = e.target;
+                      if (select.value && select.value !== '0') {
+                        const option = select.options[select.selectedIndex];
+                        handleCategoryChange(select.value, option.text);
+                      }
+                    }}
                     onChange={(e) => {
                       const option = e.target.options[e.target.selectedIndex];
                       handleCategoryChange(e.target.value, option.text);
