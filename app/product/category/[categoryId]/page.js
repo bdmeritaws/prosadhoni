@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import ProductCart from "@/app/product/productCart";
 import Image from "next/image";
 import { useRouter, useParams } from "next/navigation";
-import { getMainCategories, getSubcategories } from "@/app/utils/api";
+import { getMainCategories, getSubcategories, generateSlug } from "@/app/utils/api";
 
 function CategoryPage() {
   const router = useRouter();
@@ -27,11 +27,19 @@ function CategoryPage() {
       if (data?.category && Array.isArray(data.category)) {
         // Find category by slug (case-insensitive comparison)
         const foundCategory = data.category.find(
-          (cat) => 
-            cat.category_slug?.toLowerCase().replace(/-/g, ' ').trim() === slug?.toLowerCase().replace(/-/g, ' ').trim() ||
-            cat.main_category_name?.toLowerCase().replace(/-/g, ' ').trim() === slug?.toLowerCase().replace(/-/g, ' ').trim() ||
-            slug?.toLowerCase() === cat.main_category_name?.toLowerCase().replace(/\s+/g, '-').trim() ||
-            slug?.toLowerCase() === cat.category_slug?.toLowerCase().replace(/\s+/g, '-').trim()
+          (cat) => {
+            // Generate slug from main_category_name
+            const generatedSlug = generateSlug(cat.main_category_name);
+            return (
+              // Compare with generated slug from main_category_name
+              slug?.toLowerCase() === generatedSlug?.toLowerCase() ||
+              // Compare with API's category_slug if exists
+              slug?.toLowerCase() === cat.category_slug?.toLowerCase() ||
+              // Compare spaces version (for backward compatibility)
+              slug?.toLowerCase().replace(/-/g, ' ') === cat.main_category_name?.toLowerCase().replace(/\s+/g, ' ').trim() ||
+              slug?.toLowerCase().replace(/-/g, ' ') === cat.category_slug?.toLowerCase().replace(/-/g, ' ').trim()
+            );
+          }
         );
         
         if (foundCategory) {

@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useDispatch } from "react-redux";
 import { categorySlag } from "@/app/redux/product/productSlice";
-import { getMainCategories } from "@/app/utils/api";
+import { getMainCategories, generateSlug } from "@/app/utils/api";
 
 function ShopByCategory() {
   const dispatch = useDispatch();
@@ -69,8 +69,8 @@ function ShopByCategory() {
         {categories.map((category) => (
           <Link
             key={category.id}
-            href={`/product/category/${category.category_slug || category.id}`}
-            onClick={() => dispatch(categorySlag(category.category_slug || String(category.id)))}
+            href={`/product/category/${generateSlug(category.main_category_name)}`}
+            onClick={() => dispatch(categorySlag(generateSlug(category.main_category_name)))}
             className="group"
           >
             <div

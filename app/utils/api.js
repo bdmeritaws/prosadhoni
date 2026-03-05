@@ -127,6 +127,21 @@ export const getUnder99Products = async (page = 1, limit = 15) => {
   });
 };
 
+/**
+ * Generate URL-friendly slug from category name
+ * @param {string} name - The category name
+ * @returns {string} - URL-friendly slug
+ */
+export const generateSlug = (name) => {
+  if (!name) return "";
+  return name
+    .toLowerCase()
+    .replace(/\s+/g, '-')
+    .replace(/[^a-z0-9-]/g, '')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
+};
+
 export default {
   getMainCategories,
   getCategoryProducts,
@@ -136,4 +151,5 @@ export default {
   searchProducts,
   getTopDeals,
   getUnder99Products,
+  generateSlug,
 };

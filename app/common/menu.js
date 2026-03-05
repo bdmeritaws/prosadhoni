@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
 import { categorySlag, productName } from "@/app/redux/product/productSlice";
 import { useRouter, usePathname } from "next/navigation";
+import { getMainCategories, generateSlug } from "@/app/utils/api";
 
 const LOGO_URL =
   "https://babshahi.s3.ap-south-1.amazonaws.com/category/logo-prosadhoni.webp";
@@ -162,8 +163,8 @@ function Menu({ category }) {
     setShowDropdown(false); // Close search dropdown when category is selected
 
     // Convert name to slug for the URL
-    const slug = id === "0" ? "0" : (name || "").toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-    dispatch(categorySlag(id));
+    const slug = id === "0" ? "0" : generateSlug(name);
+    dispatch(categorySlag(slug));
     if (id === "0") {
       router.push("/");
     } else {
