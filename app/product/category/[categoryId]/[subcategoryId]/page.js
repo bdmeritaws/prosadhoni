@@ -151,7 +151,7 @@ function SubCategoryPage() {
                 sub.sub_cat_name ||
                 "Sub Category",
               slug: sub.slug || sub.name?.toLowerCase().replace(/\s+/g, '-') || sub.id,
-              icon: sub.image || sub.icon || "",
+              icon: sub.category_image || sub.image || sub.icon || "",
             })),
           ];
           setSubCategories(formatted);

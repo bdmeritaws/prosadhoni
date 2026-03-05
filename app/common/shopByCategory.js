@@ -1,72 +1,61 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useDispatch } from "react-redux";
 import { categorySlag } from "@/app/redux/product/productSlice";
-
-// Static category data with images - using category name as slug
-const categories = [
-  {
-    id: 1,
-    name: "Skincare",
-    image:
-      "https://babshahi.s3.ap-south-1.amazonaws.com/category/skincare.webp",
-    slug: "skincare",
-  },
-  {
-    id: 2,
-    name: "Haircare",
-    image:
-      "https://babshahi.s3.ap-south-1.amazonaws.com/category/haircare.webp",
-    slug: "haircare",
-  },
-  {
-    id: 3,
-    name: "Personal Care",
-    image:
-      "https://babshahi.s3.ap-south-1.amazonaws.com/category/personal-care.webp",
-    slug: "personal-care",
-  },
-  {
-    id: 4,
-    name: "Men's Grooming",
-    image:
-      "https://babshahi.s3.ap-south-1.amazonaws.com/category/men’s-grooming.webp",
-    slug: "mens-grooming",
-  },
-  {
-    id: 5,
-    name: "Fragrance & Perfume",
-    image:
-      "https://babshahi.s3.ap-south-1.amazonaws.com/category/fragrance-&-perfume.webp",
-    slug: "fragrance-perfume",
-  },
-  {
-    id: 6,
-    name: "Makeup",
-    image:
-      "https://babshahi.s3.ap-south-1.amazonaws.com/category/makeup.webp",
-    slug: "makeup",
-  },
-  {
-    id: 7,
-    name: "Organic Beauty",
-    image:
-      "https://babshahi.s3.ap-south-1.amazonaws.com/category/logo.jpeg",
-    slug: "organic-beauty",
-  },
-  {
-    id: 8,
-    name: "Beauty Tools & Device",
-    image:
-      "https://babshahi.s3.ap-south-1.amazonaws.com/category/beauty-tools-&-device.webp",
-    slug: "beauty-tools",
-  },
-];
+import { getMainCategories } from "@/app/utils/api";
 
 function ShopByCategory() {
   const dispatch = useDispatch();
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await getMainCategories();
+        if (response.success && response.data.category) {
+          setCategories(response.data.category);
+        } else {
+          setError("Failed to fetch categories");
+        }
+      } catch (err) {
+        setError("Error loading categories");
+        console.error("Error fetching categories:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="container mx-auto mt-14 px-4">
+        <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-8">
+          Shop By Category
+        </h2>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+          {[...Array(8)].map((_, index) => (
+            <div
+              key={index}
+              className="animate-pulse bg-gray-200 rounded-2xl p-6 flex flex-col items-center justify-center h-40"
+            >
+              <div className="w-16 h-16 bg-gray-300 rounded-full mb-4"></div>
+              <div className="h-4 w-20 bg-gray-300 rounded"></div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (error || categories.length === 0) {
+    return null;
+  }
 
   return (
     <div className="container mx-auto mt-14 px-4">
@@ -80,8 +69,8 @@ function ShopByCategory() {
         {categories.map((category) => (
           <Link
             key={category.id}
-            href={`/product/category/${category.slug}`}
-            onClick={() => dispatch(categorySlag(category.slug))}
+            href={`/product/category/${category.category_slug || category.id}`}
+            onClick={() => dispatch(categorySlag(category.category_slug || String(category.id)))}
             className="group"
           >
             <div
@@ -110,10 +99,11 @@ function ShopByCategory() {
                 "
               >
                 <Image
-                  src={category.image}
-                  alt={category.name}
+                  src={category.category_image || "/images/logo/favicon.ico"}
+                  alt={category.main_category_name || "Category"}
                   fill
                   className="object-contain"
+                  unoptimized
                 />
               </div>
 
@@ -128,7 +118,7 @@ function ShopByCategory() {
                 group-hover:text-pink-600
                 "
               >
-                {category.name}
+                {category.main_category_name}
               </p>
 
               {/* Soft Background Glow */}
