@@ -9,7 +9,7 @@ const COMMON_PARAMS = {
   ClientService: "frontend-client",
   AuthKey: "Babshahi",
   ContentType: "application/json",
-  shop_name: "prosadhoni",
+  institute_id: "10",
 };
 
 const fetchAPI = async (endpoint, bodyParams = {}) => {

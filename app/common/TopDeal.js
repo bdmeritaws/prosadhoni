@@ -23,8 +23,7 @@ export default function TopDeal() {
             ClientService: "frontend-client",
             AuthKey: "Babshahi",
             ContentType: "application/json",
-            shop_name: "prosadhoni",
-            category_id: ""
+            institute_id: 10
           })
         });
 

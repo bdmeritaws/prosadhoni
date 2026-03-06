@@ -17,30 +17,52 @@ export const metadata = {
 
 
 const getCategory = async () => {
-    const AppURL = process.env.NEXT_PUBLIC_BASE_URL;
-    const url = AppURL + "category";
-    const result = await fetch(url, {
-        next: { revalidate: 1200 },
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "Origin": "https://babshahi.com",
-            "Referer": "https://babshahi.com",
-            "User-Agent": "Mozilla/5.0"
-        },
-        body: JSON.stringify({
-            ClientService: "frontend-client",
-            AuthKey: "Babshahi",
-            ContentType: "application/json",
-            shop_name: "prosadhoni",
-        }),
-    });
-    if (result.status === 200) return result.json();
-    else throw new Error("Internal server error");
+    try {
+        const AppURL = process.env.NEXT_PUBLIC_BASE_URL;
+        const url = AppURL + "category";
+        const result = await fetch(url, {
+            next: { revalidate: 1200 },
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Origin": "https://babshahi.com",
+                "Referer": "https://babshahi.com",
+                "User-Agent": "Mozilla/5.0"
+            },
+            body: JSON.stringify({
+                ClientService: "frontend-client",
+                AuthKey: "Babshahi",
+                ContentType: "application/json",
+                institute_id: 10,
+            }),
+        });
+
+        // Check if response is OK
+        if (!result.ok) {
+            // console.error(`Category API Error: ${result.status} ${result.statusText}`);
+            return null;
+        }
+
+        // Check content-type to ensure it's JSON
+        const contentType = result.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+            // console.error("Category API Error: Response is not JSON, possibly HTML error page");
+            const text = await result.text();
+            // console.error("Response preview:", text.substring(0, 200));
+            return null;
+        }
+
+        return result.json();
+    } catch (error) {
+        console.error("Category API Fetch Error:", error);
+        return null;
+    }
 };
 
 export default async function RootLayout({ children }) {
     const response = await getCategory();
+    // API returns { data: { category: [...] } } or { data: { status: 405, message: ... } }
+    const categories = response?.data?.category || [];
 
     return (
         <html lang="en">
@@ -69,7 +91,7 @@ export default async function RootLayout({ children }) {
                 {/* End GTM */}
 
                 <Providers>
-                    <Menu category={response?.category} />
+                    <Menu category={categories} />
                     {children}
                     <Footer />
                     <ModalSideBar />

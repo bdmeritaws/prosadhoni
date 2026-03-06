@@ -25,6 +25,7 @@ function Menu({ category }) {
   const [searchResults, setSearchResults] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
+  const [menuCategories, setMenuCategories] = useState(category || []);
 
   const inputRef = useRef(null);
   const searchRef = useRef(null);
@@ -40,6 +41,29 @@ function Menu({ category }) {
   useEffect(() => {
     setTotalCart(cartProduct?.length || 0);
   }, [cartProduct]);
+
+  // ================= FETCH CATEGORIES IF NOT PROVIDED =================
+  useEffect(() => {
+    const fetchCategories = async () => {
+      // If categories were passed via props, use them
+      if (category && category.length > 0) {
+        setMenuCategories(category);
+        return;
+      }
+      
+      // Otherwise fetch them
+      try {
+        const response = await getMainCategories();
+        if (response.success && response.data?.category) {
+          setMenuCategories(response.data.category);
+        }
+      } catch (error) {
+        console.error("Error fetching categories in menu:", error);
+      }
+    };
+
+    fetchCategories();
+  }, [category]);
 
   // ================= CLEAR SEARCH WHEN HOME =================
   useEffect(() => {
@@ -224,7 +248,7 @@ function Menu({ category }) {
                 value=""
               >
                 <option value="0">Categories</option>
-                {category?.map((cat) => (
+                {menuCategories?.map((cat) => (
                   <option key={cat.id} value={cat.id}>
                     {cat.main_category_name}
                   </option>
@@ -393,7 +417,7 @@ function Menu({ category }) {
                     value=""
                   >
                     <option value="0">Categories</option>
-                    {category?.map((cat) => (
+                    {menuCategories?.map((cat) => (
                       <option key={cat.id} value={cat.id}>
                         {cat.main_category_name}
                       </option>
