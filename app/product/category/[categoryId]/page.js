@@ -172,37 +172,60 @@ function CategoryPage() {
   return (
     <div className="container mx-auto mt-6 px-2">
 
-      {/* ================= MOBILE SUBCATEGORY ================= */}
-      <div className="lg:hidden mb-4 overflow-x-auto">
-        <div className="flex gap-3">
-          {loading ? (
-            <div className="flex gap-3 animate-pulse">
-              {[1, 2, 3, 4, 5].map((i) => (
-                <div
-                  key={i}
-                  className="px-4 py-2 rounded-full bg-gray-200 h-10 w-20"
-                ></div>
-              ))}
-            </div>
-          ) : (
-            subCategories.map((sub) => (
-              <button
-                key={sub.id}
-                onClick={() => handleSubCategoryClick(sub)}
-                className={`px-4 py-2 whitespace-nowrap rounded-full border text-sm
-                  transition-all duration-300 ease-in-out
-                  ${
-                    isSubActive(sub)
-                      ? "bg-[#8F2C8C] text-white border-[#8F2C8C]"
-                      : "bg-white border-gray-300 hover:bg-[#8F2C8C] hover:text-white hover:border-[#8F2C8C]"
-                  }`}
-              >
-                {sub.name}
-              </button>
-            ))
-          )}
+{/* ================= MOBILE SUBCATEGORY ================= */}
+<div className="lg:hidden mb-4 overflow-x-auto">
+  {loading ? (
+    <div className="flex gap-3 animate-pulse">
+      {[1, 2, 3, 4, 5].map((i) => (
+        <div key={i} className="w-20 text-center">
+          <div className="w-16 h-16 bg-gray-200 rounded-full mx-auto"></div>
+          <div className="h-3 bg-gray-200 rounded mt-2"></div>
         </div>
-      </div>
+      ))}
+    </div>
+  ) : (
+    <div className="flex gap-3 pb-2">
+      {subCategories.map((sub) => (
+        <div
+          key={sub.id}
+          onClick={() => handleSubCategoryClick(sub)}
+          className={`flex flex-col items-center cursor-pointer min-w-[70px]
+            transition-all duration-300`}
+        >
+          <div
+            className={`w-16 h-16 rounded-full border flex items-center justify-center overflow-hidden
+            ${
+              isSubActive(sub)
+                ? "border-[#8F2C8C] ring-2 ring-[#8F2C8C]"
+                : "border-gray-200"
+            }`}
+          >
+            {sub.icon ? (
+              <Image
+                src={sub.icon}
+                alt={sub.name}
+                width={64}
+                height={64}
+                className="object-cover w-full h-full"
+              />
+            ) : (
+              <span className="text-xs font-semibold">
+                {sub.name?.charAt(0)}
+              </span>
+            )}
+          </div>
+
+          <span
+            className={`text-xs mt-1 text-center leading-tight
+            ${isSubActive(sub) ? "text-[#8F2C8C] font-semibold" : ""}`}
+          >
+            {sub.name}
+          </span>
+        </div>
+      ))}
+    </div>
+  )}
+</div>
 
       <div className="grid grid-cols-12 gap-5">
 

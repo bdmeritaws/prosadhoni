@@ -34,7 +34,7 @@ function CartBody({ productId }) {
                         ClientService: "frontend-client",
                         AuthKey: "Babshahi",
                         ContentType: "application/json",
-                        shop_name: "prosadhoni",
+                        institute_id: 10,
                         category_id: "",
                     }),
                 });
