@@ -7,7 +7,7 @@ import AddToCart from "@/app/common/addToCart";
 import { useSelector } from "react-redux";
 import noResultFound from "../../public/No-Result-Found.jpg";
 import Image from "next/image";
-import { getCategoryProducts, getSubcategoryProducts } from "@/app/utils/api";
+import { getCategoryProducts, getSubcategoryProducts, getProductsByInventorySubcategory } from "@/app/utils/api";
 
 function ProductCart({ slug, filterType, subCategory }) {
   const AppURL = process.env.NEXT_PUBLIC_BASE_URL;
@@ -86,6 +86,15 @@ function ProductCart({ slug, filterType, subCategory }) {
           console.log("Fetching all products for category:", categoryId || slug);
           const apiResult = await getCategoryProducts(categoryId || slug, page, itemsPerPage);
           result = apiResult.data || {};
+        }
+      } else if (filterType === "inventory_subcategory") {
+        // Fetch products by inventory subcategory (for shop by concern page)
+        if (subCategory) {
+          console.log("Fetching products by inventory subcategory:", subCategory);
+          const apiResult = await getProductsByInventorySubcategory(subCategory, page, itemsPerPage);
+          result = apiResult.data || {};
+        } else {
+          result = { products: [] };
         }
       } else if (slug) {
         // Check if slug is numeric (category ID) or string (search text)

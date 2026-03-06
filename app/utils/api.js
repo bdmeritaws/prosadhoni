@@ -128,6 +128,27 @@ export const getUnder99Products = async (page = 1, limit = 15) => {
 };
 
 /**
+ * Get inventory subcategories (for shop by concern section)
+ * Endpoint: inventory_subcategory
+ */
+export const getInventorySubcategories = async () => {
+  return fetchAPI("inventory_subcategory", {});
+};
+
+/**
+ * Get products by inventory subcategory (for shop by concern detail page)
+ * Endpoint: product_by_inventory_subcategory
+ * @param {string|number} subcategoryId - The subcategory ID
+ */
+export const getProductsByInventorySubcategory = async (subcategoryId, page = 1, limit = 15) => {
+  return fetchAPI("product_by_inventory_subcategory", {
+    subcategory_id: String(subcategoryId),
+    page,
+    limit,
+  });
+};
+
+/**
  * Generate URL-friendly slug from category name
  * @param {string} name - The category name
  * @returns {string} - URL-friendly slug
@@ -151,5 +172,7 @@ export default {
   searchProducts,
   getTopDeals,
   getUnder99Products,
+  getInventorySubcategories,
+  getProductsByInventorySubcategory,
   generateSlug,
 };

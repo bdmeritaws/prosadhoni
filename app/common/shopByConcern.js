@@ -1,21 +1,76 @@
 "use client";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-
-const concerns = [
-  { id: 1, name: "Acne", image: "https://babshahi.s3.ap-south-1.amazonaws.com/category/acne.webp", slug: "acne" },
-  { id: 2, name: "Anti Aging", image: "https://babshahi.s3.ap-south-1.amazonaws.com/category/anti-aging.webp", slug: "anti-aging" },
-  { id: 3, name: "Dandruff", image: "https://babshahi.s3.ap-south-1.amazonaws.com/category/dandruff.webp", slug: "dandruff" },
-  { id: 4, name: "Dry Skin", image: "https://babshahi.s3.ap-south-1.amazonaws.com/category/dry-skin.webp", slug: "dry-skin" },
-  { id: 5, name: "Lips", image: "https://babshahi.s3.ap-south-1.amazonaws.com/category/lips.webp", slug: "lips" },
-  { id: 6, name: "Hair Fall", image: "https://babshahi.s3.ap-south-1.amazonaws.com/category/hair-fall.webp", slug: "hair-fall" },
-  { id: 7, name: "Pore", image: "https://babshahi.s3.ap-south-1.amazonaws.com/category/pore.webp", slug: "pore" },
-  { id: 8, name: "Spot", image: "https://babshahi.s3.ap-south-1.amazonaws.com/category/spot.webp", slug: "spot" },
-  { id: 9, name: "Sunburn", image: "https://babshahi.s3.ap-south-1.amazonaws.com/category/sunburn.webp", slug: "sunburn" },
-];
+import { getInventorySubcategories, generateSlug } from "../utils/api";
 
 function ShopByConcern() {
+  const [concerns, setConcerns] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchConcerns = async () => {
+      try {
+        const response = await getInventorySubcategories();
+        
+        if (response.success && response.data && response.data.status === 200 && response.data.subcategory) {
+          // Transform API data to match component structure
+          const transformedData = response.data.subcategory.map((item) => ({
+            id: item.id,
+            name: item.sub_category_name,
+            image: item.sub_category_image,
+            slug: generateSlug(item.sub_category_name),
+          }));
+          setConcerns(transformedData);
+        } else {
+          setError("Failed to fetch concerns");
+        }
+      } catch (err) {
+        setError("Error loading concerns");
+        console.error("Error fetching concerns:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchConcerns();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="container mx-auto mt-14 px-4">
+        <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-8">
+          Shop By Concern
+        </h2>
+        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-8">
+          {[...Array(6)].map((_, index) => (
+            <div
+              key={index}
+              className="animate-pulse bg-gray-200 rounded-full p-[3px] flex flex-col items-center"
+            >
+              <div className="w-28 h-28 md:w-32 md:h-32 bg-gray-300 rounded-full"></div>
+              <div className="h-4 w-16 bg-gray-300 rounded mt-4"></div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (error || concerns.length === 0) {
+    return (
+      <div className="container mx-auto mt-14 px-4">
+        <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-8">
+          Shop By Concern
+        </h2>
+        <div className="flex justify-center items-center py-10">
+          <p className="text-gray-500 text-lg">No data found</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto mt-14 px-4">
       {/* Title */}
@@ -28,7 +83,7 @@ function ShopByConcern() {
         {concerns.map((concern) => (
           <Link
             key={concern.id}
-            href={`/search/${concern.slug}`}
+            href={`/product/shop-by-concern/${concern.slug}?id=${concern.id}`}
             className="flex flex-col items-center group transition-all duration-300"
           >
             {/* Outer Animated Ring */}
