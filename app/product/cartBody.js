@@ -318,7 +318,7 @@ function CartBody({ productId }) {
 
             {/* ================= RELATED PRODUCTS ================= */}
             <div className="mt-10">
-                <RelatedProducts categoryId={productDetails.category_id} />
+                <RelatedProducts categoryId={productDetails.category_id} currentProductSlug={productDetails.slag_name} />
             </div>
 
         </div>

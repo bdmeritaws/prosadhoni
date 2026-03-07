@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import AddToCart from "@/app/common/addToCart";
 
-function RelatedProducts({ categoryId }) {
+function RelatedProducts({ categoryId, currentProductSlug }) {
     const AppURL = process.env.NEXT_PUBLIC_BASE_URL;
     const [products, setProducts] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -24,15 +24,18 @@ function RelatedProducts({ categoryId }) {
                         ClientService: "frontend-client",
                         AuthKey: "Babshahi",
                         ContentType: "application/json",
-                        shop_name: "prosadhoni",
+                        institute_id: 10,
                         category_id: categoryId,
                         limit: 8,
                     }),
                 });
 
                 const res = await response.json();
-                // Show only first 8 products
-                setProducts(res?.products?.slice(0, 8) || []);
+                // Filter out current product and show only first 8 products
+                const filteredProducts = res?.products?.filter(
+                    (item) => item.slag_name !== currentProductSlug
+                ).slice(0, 8) || [];
+                setProducts(filteredProducts);
                 setIsLoading(false);
             } catch (error) {
                 console.error("Error fetching related products:", error);
