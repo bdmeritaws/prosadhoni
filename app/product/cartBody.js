@@ -264,7 +264,7 @@ function CartBody({ productId }) {
                             className="bg-black text-white rounded-md py-2 text-center flex justify-center gap-2"
                         >
                             <Telephone size={18} color="blue" />
-                            +8801816 668 833
+                            +8801727123480
                         </a>
 
                     </div>
