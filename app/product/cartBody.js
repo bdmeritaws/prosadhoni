@@ -158,9 +158,9 @@ function CartBody({ productId }) {
           {/* Rating */}
 
           <div className="flex items-center mt-3 space-x-2">
-            <div className="text-yellow-500 text-lg">★★★★☆</div>
+            <div className="text-yellow-500 text-lg">★★★★★</div>
             <span className="text-sm text-gray-500">
-              ({productDetails.rating_count || 4} Ratings)
+              ({productDetails.rating_count || 5} Ratings)
             </span>
           </div>
 
