@@ -5,6 +5,7 @@ import Loader from "@/app/product/loader";
 import AddToCart from "@/app/common/addToCart";
 import RelatedProducts from "@/app/product/relatedProducts";
 import { Messenger, Whatsapp, Telephone } from "react-bootstrap-icons";
+import ProductBreadcrumb from "@/app/common/ProductBreadcrumb";
 
 function CartBody({ productId }) {
 
@@ -103,7 +104,9 @@ function CartBody({ productId }) {
 
   return (
 
-    <div className="container mx-auto px-4 mt-10">
+    <>
+      <ProductBreadcrumb productDetails={productDetails} />
+      <div className="container mx-auto px-4">
 
       {/* ================= PRODUCT SECTION ================= */}
 
@@ -320,7 +323,7 @@ function CartBody({ productId }) {
       </div>
 
     </div>
-
+    </>
   );
 }
 

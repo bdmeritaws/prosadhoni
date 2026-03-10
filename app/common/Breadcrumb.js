@@ -3,21 +3,19 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { House } from "react-bootstrap-icons";
-
-// Route configuration - maps URL patterns to breadcrumb paths
-const routeConfig = {
-  "cart": { label: "Shopping Cart", path: "/cart", parent: "home" },
-  "order": { label: "Order Details", path: "/order", parent: null },
-  "top-deals": { label: "Top Deals", path: "/top-deals", parent: "home" },
-  "products": { label: "Products", path: null, parent: "home" },
-  "under-99": { label: "Under 99", path: "/products/under-99", parent: "home" },
-};
+import { useEffect, useState } from "react";
 
 export default function Breadcrumb() {
   const pathname = usePathname();
   
   // Don't show breadcrumb on home page
   if (pathname === "/" || pathname === "") return null;
+
+  // Don't show main breadcrumb on product detail pages
+  // ProductBreadcrumb component handles those
+  if (pathname.startsWith("/product/") && pathname.split("/").length === 3) {
+    return null;
+  }
 
   // Generate breadcrumbs based on pathname
   const breadcrumbs = generateBreadcrumbs(pathname);
@@ -67,28 +65,49 @@ function generateBreadcrumbs(pathname) {
   const segments = pathname.split("/").filter((segment) => segment);
   const breadcrumbs = [];
 
-  // Handle different route patterns
+  // Handle product detail page - fetch product data
+  if (segments[0] === "product" && segments.length === 2 && !isNaN(segments[1])) {
+    // For numeric product IDs, we'll handle this with dynamic data
+    breadcrumbs.push({ label: "Products", path: null });
+    breadcrumbs.push({ label: "Loading...", path: null });
+    return breadcrumbs;
+  }
+
+  // Handle product detail page with slug
+  if (segments[0] === "product" && segments.length === 2) {
+    // Product slug - need to show category and product name
+    breadcrumbs.push({ label: "Products", path: null });
+    // This will be replaced by dynamic data in the component
+    breadcrumbs.push({ label: "Product Details", path: null });
+    return breadcrumbs;
+  }
+
+  // Handle cart
   if (segments[0] === "cart") {
     breadcrumbs.push({ label: "Shopping Cart", path: "/cart" });
   }
+  // Handle order
   else if (segments[0] === "order") {
     breadcrumbs.push({ label: "Order Details", path: null });
   }
+  // Handle top-deals
   else if (segments[0] === "top-deals") {
     breadcrumbs.push({ label: "Top Deals", path: "/top-deals" });
   }
+  // Handle under-99
   else if (segments[0] === "products" && segments[1] === "under-99") {
     breadcrumbs.push({ label: "Under 99", path: "/products/under-99" });
   }
+  // Handle search
   else if (segments[0] === "search") {
     breadcrumbs.push({ label: "Search Results", path: null });
   }
+  // Handle product routes
   else if (segments[0] === "product") {
-    // Product routes: /product/[productId] or /product/category/...
     if (segments[1] === "category") {
       // Category page: /product/category/[categoryId] or /product/category/[categoryId]/[subcategoryId]
       if (segments[2]) {
-        // Main category
+        // Main category - format the slug to readable name
         const categoryName = formatCategoryName(segments[2]);
         breadcrumbs.push({ label: categoryName, path: `/product/category/${segments[2]}` });
         
@@ -107,10 +126,6 @@ function generateBreadcrumbs(pathname) {
         breadcrumbs.push({ label: concernName, path: null });
       }
     }
-    else {
-      // Product details: /product/[productId]
-      breadcrumbs.push({ label: "Product Details", path: null });
-    }
   }
   else {
     // For any other routes, format the segment name
@@ -128,7 +143,7 @@ function generateBreadcrumbs(pathname) {
 function formatCategoryName(segment) {
   // If it's a numeric ID, return a generic label
   if (/^\d+$/.test(segment)) {
-    return "Product Details";
+    return "Products";
   }
   
   // Check predefined labels
