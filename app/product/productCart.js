@@ -148,6 +148,13 @@ function ProductCart({ slug, filterType, subCategory }) {
 
       setProducts(result?.products || []);
 
+      // Remove duplicate products based on slag_name
+      const uniqueProducts = (result?.products || []).filter(
+        (product, index, self) =>
+          index === self.findIndex((p) => p.slag_name === product.slag_name)
+      );
+      setProducts(uniqueProducts);
+
       if (result?.total) {
         setTotalPages(Math.ceil(result.total / itemsPerPage));
       } else if (result?.products?.length) {
