@@ -242,9 +242,13 @@ function SubCategoryPage() {
                 className="w-full h-full object-cover"
               />
             ) : (
-              <span className="text-xs font-semibold">
-                {sub.name?.charAt(0)}
-              </span>
+              <Image
+                src="/images/all-icon.webp"
+                alt={sub.name}
+                width={56}
+                height={56}
+                className="w-full h-full object-cover"
+              />
             )}
           </div>
 
@@ -304,11 +308,13 @@ function SubCategoryPage() {
                         className="w-10 h-10 rounded-full object-cover"
                       />
                     ) : (
-                      <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
-                        <span className="text-xs font-medium">
-                          {sub.name?.charAt(0)}
-                        </span>
-                      </div>
+                      <Image
+                        src="/images/all-icon.webp"
+                        alt={sub.name}
+                        width={40}
+                        height={40}
+                        className="w-10 h-10 rounded-full object-cover"
+                      />
                     )}
 
                     <span className="text-sm font-medium">
