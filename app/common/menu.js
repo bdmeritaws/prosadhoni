@@ -143,7 +143,7 @@ function Menu({ category }) {
               ClientService: "frontend-client",
               AuthKey: "Babshahi",
               ContentType: "application/json",
-              shop_name: "prosadhoni",
+              institute_id: 10,
               product_name: searchTerm,
             }),
           }
