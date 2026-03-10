@@ -65,7 +65,9 @@ function RelatedProducts({ categoryId, currentProductSlug }) {
     }
 
     return (
-        <div className="grid lg:grid-cols-4 grid-cols-2 md:gap-4 gap-2.5">
+        <div className="mt-8">
+            <h3 className="text-xl font-semibold text-gray-800 mb-4">You Might Also Like</h3>
+            <div className="grid lg:grid-cols-4 grid-cols-2 md:gap-4 gap-2.5">
             {products.map((v_product, index) => (
                 <div
                     key={index}
@@ -109,6 +111,7 @@ function RelatedProducts({ categoryId, currentProductSlug }) {
                 </div>
             ))}
         </div>
+    </div>
     );
 }
 

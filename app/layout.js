@@ -7,6 +7,7 @@ import Providers from "@/app/redux/provider";
 import Script from "next/script";
 import ModalSideBar from "@/app/common/modalSideBar";
 import ModalOrderConfirmed from "@/app/common/modalOrderConfirmed";
+import Breadcrumb from "@/app/common/Breadcrumb";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -92,6 +93,7 @@ export default async function RootLayout({ children }) {
 
                 <Providers>
                     <Menu category={categories} />
+                    <Breadcrumb />
                     {children}
                     <Footer />
                     <ModalSideBar />
