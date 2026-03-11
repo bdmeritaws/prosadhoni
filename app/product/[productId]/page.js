@@ -37,6 +37,7 @@ const getProduct = async () => {
 
 export default async function ProductDetails({params}) {
     const {productId} = params;
+    console.log(productId);
     return (
         <div className="md:container">
             <CartBody productId={productId}/>

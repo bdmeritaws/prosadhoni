@@ -149,6 +149,59 @@ export const getProductsByInventorySubcategory = async (subcategoryId, page = 1,
 };
 
 /**
+ * Save product review
+ * Endpoint: save_product_review
+ * @param {string|number} productId - The product ID
+ * @param {string} reviewerName - Reviewer's name
+ * @param {string} review - Review text
+ * @param {number} rating - Rating (1-5)
+ * @param {File|string} reviewImage - File object or empty string
+ */
+export const saveProductReview = async (productId, reviewerName, review, rating, reviewImage = "") => {
+  
+  // If there's an image file, use FormData
+  if (reviewImage instanceof File) {
+    const formData = new FormData();
+    formData.append('ClientService', 'frontend-client');
+    formData.append('AuthKey', 'Babshahi');
+    formData.append('ContentType', 'application/json');
+    formData.append('institute_id', '10');
+    formData.append('product_id', String(productId));
+    formData.append('reviewer_name', reviewerName);
+    formData.append('review', review);
+    formData.append('rating', String(rating));
+    formData.append('review_image', reviewImage);
+
+    try {
+      const response = await fetch(`${BASE_URL}save_product_review`, {
+        method: "POST",
+        headers: {
+          Origin: "https://babshahi.com",
+          Referer: "https://babshahi.com",
+          "User-Agent": "Mozilla/5.0",
+        },
+        body: formData,
+      });
+
+      const data = await response.json();
+      return { success: response.ok, data };
+    } catch (error) {
+      console.error("API Error (save_product_review):", error);
+      return { success: false, error };
+    }
+  }
+  
+  // No image - use JSON as before
+  return fetchAPI("save_product_review", {
+    product_id: String(productId),
+    reviewer_name: reviewerName,
+    review: review,
+    rating: String(rating),
+    review_image: "",
+  });
+};
+
+/**
  * Generate URL-friendly slug from category name
  * @param {string} name - The category name
  * @returns {string} - URL-friendly slug
@@ -175,4 +228,5 @@ export default {
   getInventorySubcategories,
   getProductsByInventorySubcategory,
   generateSlug,
+  saveProductReview,
 };
