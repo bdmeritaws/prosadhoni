@@ -46,7 +46,7 @@ export default function ProductBreadcrumb({ productDetails }) {
     return (
       <div className="container mx-auto px-4 py-3">
         <nav aria-label="breadcrumb" className="text-sm">
-          <ol className="flex items-center gap-1 overflow-x-auto whitespace-nowrap no-scrollbar md:flex-wrap md:whitespace-normal md:overflow-visible">
+          <ol className="flex items-center gap-1 overflow-x-auto whitespace-nowrap no-scrollbar md:flex-wrap md:whitespace-normal md:overflow-visible breadcrumb-scroll">
 
             <li className="flex items-center flex-shrink-0">
               <Link
@@ -66,7 +66,7 @@ export default function ProductBreadcrumb({ productDetails }) {
                   <span className="mx-2 text-gray-400">›</span>
 
                   {isLast ? (
-                    <span className="text-gray-700 font-medium max-w-[150px] md:max-w-none truncate">
+                    <span className="text-gray-700 font-medium">
                       {crumb.label}
                     </span>
                   ) : (
@@ -90,7 +90,7 @@ export default function ProductBreadcrumb({ productDetails }) {
   return (
     <div className="container mx-auto px-4 py-3">
       <nav aria-label="breadcrumb" className="text-sm">
-        <ol className="flex items-center gap-1 overflow-x-auto whitespace-nowrap no-scrollbar md:flex-wrap md:whitespace-normal md:overflow-visible">
+        <ol className="flex items-center gap-1 overflow-x-auto whitespace-nowrap no-scrollbar md:flex-wrap md:whitespace-normal md:overflow-visible breadcrumb-scroll">
           <li className="flex items-center">
             <Link
               href="/"
@@ -108,7 +108,7 @@ export default function ProductBreadcrumb({ productDetails }) {
               <li key={crumb.path || index} className="flex items-center flex-shrink-0">
                 <span className="mx-2 text-gray-400">›</span>
                 {isLast ? (
-                  <span className="text-gray-700 font-medium max-w-[150px] md:max-w-none truncate">
+                  <span className="text-gray-700 font-medium">
                     {crumb.label}
                   </span>
                 ) : crumb.path ? (
