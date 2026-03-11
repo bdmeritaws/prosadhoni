@@ -10,7 +10,7 @@ function SubCategoryPage() {
   const params = useParams();
   const categoryIdOrSlug = params?.categoryId;
   const subcategoryIdOrSlug = params?.subcategoryId;
-  
+
   const [activeSub, setActiveSub] = useState("all");
   const [subCategories, setSubCategories] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -24,16 +24,16 @@ function SubCategoryPage() {
     try {
       const result = await getMainCategories(); // Uses 'category' endpoint
       const data = result.data;
-      
+
       if (data?.category && Array.isArray(data.category)) {
         const foundCategory = data.category.find(
-          (cat) => 
+          (cat) =>
             cat.category_slug?.toLowerCase().replace(/-/g, ' ').trim() === slug?.toLowerCase().replace(/-/g, ' ').trim() ||
             cat.main_category_name?.toLowerCase().replace(/-/g, ' ').trim() === slug?.toLowerCase().replace(/-/g, ' ').trim() ||
             slug?.toLowerCase() === cat.main_category_name?.toLowerCase().replace(/\s+/g, '-').trim() ||
             slug?.toLowerCase() === cat.category_slug?.toLowerCase().replace(/\s+/g, '-').trim()
         );
-        
+
         if (foundCategory) {
           return { id: foundCategory.id, name: foundCategory.main_category_name };
         }
@@ -50,7 +50,7 @@ function SubCategoryPage() {
     try {
       const result = await getSubcategories(catId);
       const data = result.data;
-      
+
       let subCategoryList = [];
       if (Array.isArray(data?.subcategories)) {
         subCategoryList = data.subcategories;
@@ -64,12 +64,12 @@ function SubCategoryPage() {
 
       if (subCategoryList.length > 0) {
         const foundSub = subCategoryList.find(
-          (sub) => 
+          (sub) =>
             sub.slug?.toLowerCase() === slug?.toLowerCase() ||
             sub.name?.toLowerCase().replace(/\s+/g, '-').trim() === slug?.toLowerCase() ||
             String(sub.id) === String(slug)
         );
-        
+
         if (foundSub) {
           return foundSub.id;
         }
@@ -97,11 +97,11 @@ function SubCategoryPage() {
     const fetchCategoryData = async () => {
       try {
         setLoading(true);
-        
+
         // Get category ID from slug if needed
         let resolvedCatId = categoryIdOrSlug;
         let categoryInfo = null;
-        
+
         // Check if it's a numeric ID or a slug
         if (!/^\d+$/.test(categoryIdOrSlug)) {
           categoryInfo = await getCategoryIdFromSlug(categoryIdOrSlug);
@@ -205,64 +205,63 @@ function SubCategoryPage() {
   return (
     <div className="container mx-auto mt-6 px-2">
 
-{/* ================= MOBILE SUBCATEGORY ================= */}
-<div className="lg:hidden mb-4 overflow-x-auto">
-  {loading ? (
-    <div className="flex gap-4 animate-pulse">
-      {[1, 2, 3, 4, 5].map((i) => (
-        <div key={i} className="flex flex-col items-center min-w-[70px]">
-          <div className="w-14 h-14 bg-gray-200 rounded-full"></div>
-          <div className="h-3 w-12 bg-gray-200 mt-2 rounded"></div>
-        </div>
-      ))}
-    </div>
-  ) : (
-    <div className="flex gap-4 pb-2">
-      {subCategories.map((sub) => (
-        <div
-          key={sub.id}
-          onClick={() => handleSubCategoryClick(sub)}
-          className="flex flex-col items-center cursor-pointer min-w-[70px]"
-        >
-          <div
-            className={`w-14 h-14 rounded-full overflow-hidden border flex items-center justify-center
-              transition-all duration-200
-              ${
-                isSubActive(sub)
-                  ? "border-[#8F2C8C] ring-2 ring-[#8F2C8C]"
-                  : "border-gray-200"
-              }`}
-          >
-            {sub.icon ? (
-              <Image
-                src={sub.icon}
-                alt={sub.name}
-                width={56}
-                height={56}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <Image
-                src="/images/all-icon.webp"
-                alt={sub.name}
-                width={56}
-                height={56}
-                className="w-full h-full object-cover"
-              />
-            )}
+      {/* ================= MOBILE SUBCATEGORY ================= */}
+      <div className="lg:hidden mb-4 overflow-x-auto">
+        {loading ? (
+          <div className="flex gap-4 animate-pulse">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <div key={i} className="flex flex-col items-center min-w-[70px]">
+                <div className="w-14 h-14 bg-gray-200 rounded-full"></div>
+                <div className="h-3 w-12 bg-gray-200 mt-2 rounded"></div>
+              </div>
+            ))}
           </div>
+        ) : (
+          <div className="flex gap-4 pb-2">
+            {subCategories.map((sub) => (
+              <div
+                key={sub.id}
+                onClick={() => handleSubCategoryClick(sub)}
+                className="flex flex-col items-center cursor-pointer min-w-[70px]"
+              >
+                <div
+                  className={`w-14 h-14 rounded-full overflow-hidden border flex items-center justify-center
+              transition-all duration-200
+              ${isSubActive(sub)
+                      ? "border-[#8F2C8C] ring-2 ring-[#8F2C8C]"
+                      : "border-gray-200"
+                    }`}
+                >
+                  {sub.icon ? (
+                    <Image
+                      src={sub.icon}
+                      alt={sub.name}
+                      width={56}
+                      height={56}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <Image
+                      src="/images/all-icon.webp"
+                      alt={sub.name}
+                      width={56}
+                      height={56}
+                      className="w-full h-full object-cover"
+                    />
+                  )}
+                </div>
 
-          <span
-            className={`text-xs mt-1 text-center leading-tight
+                <span
+                  className={`text-xs mt-1 text-center leading-tight
               ${isSubActive(sub) ? "text-[#8F2C8C] font-semibold" : ""}`}
-          >
-            {sub.name}
-          </span>
-        </div>
-      ))}
-    </div>
-  )}
-</div>
+                >
+                  {sub.name}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
 
       <div className="grid grid-cols-12 gap-5">
 
@@ -293,10 +292,9 @@ function SubCategoryPage() {
                     onClick={() => handleSubCategoryClick(sub)}
                     className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer
                       transition-all duration-300 ease-in-out
-                      ${
-                        isSubActive(sub)
-                          ? "bg-[#8F2C8C] text-white"
-                          : "hover:bg-[#8F2C8C] hover:text-white"
+                      ${isSubActive(sub)
+                        ? "bg-[#8F2C8C] text-white"
+                        : "hover:bg-[#8F2C8C] hover:text-white"
                       }`}
                   >
                     {sub.icon ? (

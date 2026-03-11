@@ -10,7 +10,7 @@ export default function ProductBreadcrumb({ productDetails }) {
   const pathname = usePathname();
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
-  
+
   // Fetch categories if productDetails doesn't have category info
   useEffect(() => {
     const fetchCategories = async () => {
@@ -19,7 +19,7 @@ export default function ProductBreadcrumb({ productDetails }) {
         setLoading(false);
         return;
       }
-      
+
       try {
         const result = await getMainCategories();
         if (result?.data?.category) {
@@ -31,7 +31,7 @@ export default function ProductBreadcrumb({ productDetails }) {
         setLoading(false);
       }
     };
-    
+
     fetchCategories();
   }, [productDetails]);
 
@@ -44,22 +44,43 @@ export default function ProductBreadcrumb({ productDetails }) {
   // Show loading state only for product pages
   if (loading && pathname.startsWith("/product/") && pathname.split("/").length === 3) {
     return (
-      <div className="container mx-auto">
+      <div className="container mx-auto px-4 py-3">
         <nav aria-label="breadcrumb" className="text-sm">
-          <ol className="flex flex-wrap items-center gap-1">
-            <li className="flex items-center">
-              <Link 
-                href="/" 
-                className="text-[#8F2C8C] hover:text-[#7a257a] flex items-center gap-1 transition-colors"
+          <ol className="flex items-center gap-1 overflow-x-auto whitespace-nowrap no-scrollbar md:flex-wrap md:whitespace-normal md:overflow-visible">
+
+            <li className="flex items-center flex-shrink-0">
+              <Link
+                href="/"
+                className="text-[#8F2C8C] hover:text-[#7a257a] flex items-center gap-1"
               >
                 <House size={14} />
                 Home
               </Link>
             </li>
-            <li className="flex items-center">
-              <span className="mx-2 text-gray-400">›</span>
-              <span className="text-gray-400">Loading...</span>
-            </li>
+
+            {breadcrumbs.map((crumb, index) => {
+              const isLast = index === breadcrumbs.length - 1;
+
+              return (
+                <li key={index} className="flex items-center flex-shrink-0">
+                  <span className="mx-2 text-gray-400">›</span>
+
+                  {isLast ? (
+                    <span className="text-gray-700 font-medium max-w-[150px] md:max-w-none truncate">
+                      {crumb.label}
+                    </span>
+                  ) : (
+                    <Link
+                      href={crumb.path}
+                      className="text-[#8F2C8C] hover:text-[#7a257a]"
+                    >
+                      {crumb.label}
+                    </Link>
+                  )}
+                </li>
+              );
+            })}
+
           </ol>
         </nav>
       </div>
@@ -69,10 +90,10 @@ export default function ProductBreadcrumb({ productDetails }) {
   return (
     <div className="container mx-auto px-4 py-3">
       <nav aria-label="breadcrumb" className="text-sm">
-        <ol className="flex flex-wrap items-center gap-1">
+        <ol className="flex items-center gap-1 overflow-x-auto whitespace-nowrap no-scrollbar md:flex-wrap md:whitespace-normal md:overflow-visible">
           <li className="flex items-center">
-            <Link 
-              href="/" 
+            <Link
+              href="/"
               className="text-[#8F2C8C] hover:text-[#7a257a] flex items-center gap-1 transition-colors"
             >
               <House size={14} />
@@ -82,15 +103,17 @@ export default function ProductBreadcrumb({ productDetails }) {
 
           {breadcrumbs.map((crumb, index) => {
             const isLast = index === breadcrumbs.length - 1;
-            
+
             return (
-              <li key={crumb.path || index} className="flex items-center">
+              <li key={crumb.path || index} className="flex items-center flex-shrink-0">
                 <span className="mx-2 text-gray-400">›</span>
                 {isLast ? (
-                  <span className="text-gray-700 font-medium">{crumb.label}</span>
+                  <span className="text-gray-700 font-medium max-w-[150px] md:max-w-none truncate">
+                    {crumb.label}
+                  </span>
                 ) : crumb.path ? (
-                  <Link 
-                    href={crumb.path} 
+                  <Link
+                    href={crumb.path}
                     className="text-[#8F2C8C] hover:text-[#7a257a] transition-colors"
                   >
                     {crumb.label}
@@ -114,20 +137,20 @@ function generateBreadcrumbs(pathname, productDetails, categories) {
   // Handle product detail page
   if (segments[0] === "product" && segments.length === 2) {
     const productSlug = segments[1];
-    
+
     // Check if product details are available
     if (productDetails) {
       // Try multiple possible field names for category
-      let categoryName = 
-        productDetails.main_category_name || 
-        productDetails.category_name || 
+      let categoryName =
+        productDetails.main_category_name ||
+        productDetails.category_name ||
         productDetails.category?.name ||
         productDetails.main_category?.name ||
         null;
-      
-      let categorySlug = 
-        productDetails.category_slug || 
-        productDetails.main_category_slug || 
+
+      let categorySlug =
+        productDetails.category_slug ||
+        productDetails.main_category_slug ||
         productDetails.category?.slug ||
         productDetails.main_category?.slug ||
         productDetails.main_category_id ||
@@ -147,23 +170,23 @@ function generateBreadcrumbs(pathname, productDetails, categories) {
             categorySlug = foundById.category_slug || generateSlug(foundById.main_category_name);
           }
         }
-        
+
         // If still not found, try word matching
         if (!categoryName && !categorySlug) {
           const productNameLower = (productDetails.product_name || "").toLowerCase();
           const productWords = productNameLower.split(/\s+/);
-          
+
           for (const cat of categories) {
             const catNameLower = (cat.main_category_name || "").toLowerCase();
             const catSlugLower = (cat.category_slug || "").toLowerCase();
-            
+
             // Check if category name is in product name or any word matches
             for (const word of productWords) {
               // Remove special characters from word
               const cleanWord = word.replace(/[^a-z0-9]/g, '');
               const cleanCatName = catNameLower.replace(/[^a-z0-9]/g, '');
               const cleanCatSlug = catSlugLower.replace(/[^a-z0-9]/g, '');
-              
+
               if (cleanWord.length > 2 && (cleanCatName.includes(cleanWord) || cleanCatSlug.includes(cleanWord) || cleanWord.includes(cleanCatName))) {
                 categoryName = cat.main_category_name;
                 categorySlug = cat.category_slug || generateSlug(cat.main_category_name);
@@ -174,15 +197,15 @@ function generateBreadcrumbs(pathname, productDetails, categories) {
           }
         }
       }
-      
+
       // Get product name
       const productName = productDetails.product_name || productSlug.replace(/-/g, " ").replace(/\b\w/g, l => l.toUpperCase());
-      
+
       // If category info is available, add it
       if (categoryName && categorySlug) {
         breadcrumbs.push({ label: categoryName, path: `/product/category/${categorySlug}` });
       }
-      
+
       // Add product name at the end
       breadcrumbs.push({ label: productName, path: null });
     } else {
@@ -214,7 +237,7 @@ function generateBreadcrumbs(pathname, productDetails, categories) {
       if (segments[2]) {
         const categoryName = formatCategoryName(segments[2]);
         breadcrumbs.push({ label: categoryName, path: `/product/category/${segments[2]}` });
-        
+
         if (segments[3]) {
           const subcategoryName = formatCategoryName(segments[3]);
           breadcrumbs.push({ label: subcategoryName, path: null });
@@ -237,7 +260,7 @@ function formatCategoryName(segment) {
   if (/^\d+$/.test(segment)) {
     return "Products";
   }
-  
+
   const labelMap = {
     "cart": "Shopping Cart",
     "order": "Order Details",

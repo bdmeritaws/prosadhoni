@@ -211,7 +211,7 @@ function ProductCart({ slug, filterType, subCategory }) {
                   <div className="md:pt-4 pt-2">
                     <div className="md:h-12 h-14 w-[99%] mx-auto text-center mt-1">
                       <Link href={`/product/${v_product.slag_name}`}>
-                        <h4 className="text-gray-800 text-sm hover:text-primary transition">
+                        <h4 className="text-gray-800 text-sm hover:text-primary transition line-clamp-2 leading-5 min-h-[40px]">
                           {v_product?.product_name}
                         </h4>
                       </Link>
@@ -270,11 +270,10 @@ function ProductCart({ slug, filterType, subCategory }) {
             <button
               key={i}
               onClick={() => setCurrentPage(i + 1)}
-              className={`px-3 py-1 rounded ${
-                currentPage === i + 1
+              className={`px-3 py-1 rounded ${currentPage === i + 1
                   ? "bg-blue-500 text-white"
                   : "bg-gray-100"
-              }`}
+                }`}
             >
               {i + 1}
             </button>
