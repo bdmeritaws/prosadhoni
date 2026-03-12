@@ -199,13 +199,13 @@ function CartBody({ productId }) {
         setReviewImage("");
         
         // Refresh reviews
-        const productIdValue = productDetails.product_id || productDetails.id;
         const reviewsResult = await getProductReviews(productIdValue);
         if (reviewsResult.success && reviewsResult.data?.reviews) {
           setReviews(reviewsResult.data.reviews);
         }
       } else {
-        setSubmitStatus({ success: false, message: result.error?.message || "Failed to submit review" });
+        const errorMsg = result.data?.message || "Failed to submit review";
+        setSubmitStatus({ success: false, message: errorMsg });
       }
     } catch (error) {
       setSubmitStatus({ success: false, message: "An error occurred. Please try again." });
