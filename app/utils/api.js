@@ -149,6 +149,17 @@ export const getProductsByInventorySubcategory = async (subcategoryId, page = 1,
 };
 
 /**
+ * Get product reviews
+ * Endpoint: product_review
+ * @param {string|number} productId - The product ID
+ */
+export const getProductReviews = async (productId) => {
+  return fetchAPI("product_review", {
+    product_id: String(productId),
+  });
+};
+
+/**
  * Save product review
  * Endpoint: save_product_review
  * @param {string|number} productId - The product ID
@@ -228,5 +239,6 @@ export default {
   getInventorySubcategories,
   getProductsByInventorySubcategory,
   generateSlug,
+  getProductReviews,
   saveProductReview,
 };

@@ -6,7 +6,7 @@ import AddToCart from "@/app/common/addToCart";
 import RelatedProducts from "@/app/product/relatedProducts";
 import { Messenger, Whatsapp, Telephone } from "react-bootstrap-icons";
 import ProductBreadcrumb from "@/app/common/ProductBreadcrumb";
-import { saveProductReview } from "@/app/utils/api";
+import { saveProductReview, getProductReviews } from "@/app/utils/api";
 
 function CartBody({ productId }) {
 
@@ -28,6 +28,10 @@ function CartBody({ productId }) {
   const [reviewImage, setReviewImage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState({ success: false, message: "" });
+
+  // Reviews state
+  const [reviews, setReviews] = useState([]);
+  const [isReviewsLoading, setIsReviewsLoading] = useState(false);
 
   /* ================= FETCH PRODUCT ================= */
 
@@ -73,6 +77,35 @@ function CartBody({ productId }) {
     window.scrollTo(0, 0);
 
   }, [productId]);
+
+  /* ================= FETCH REVIEWS ================= */
+
+  useEffect(() => {
+    const fetchReviews = async () => {
+      if (!productDetails) return;
+      
+      // Get product ID - product may have id or product_id field
+      const productIdValue = productDetails.product_id || productDetails.id;
+      
+      if (!productIdValue) return;
+      
+      setIsReviewsLoading(true);
+      
+      try {
+        const result = await getProductReviews(productIdValue);
+        
+        if (result.success && result.data?.reviews) {
+          setReviews(result.data.reviews);
+        }
+      } catch (error) {
+        console.error("Error fetching reviews:", error);
+      } finally {
+        setIsReviewsLoading(false);
+      }
+    };
+
+    fetchReviews();
+  }, [productDetails]);
 
   if (isLoading) return <Loader />;
 
@@ -164,6 +197,13 @@ function CartBody({ productId }) {
         setReviewText("");
         setRating(0);
         setReviewImage("");
+        
+        // Refresh reviews
+        const productIdValue = productDetails.product_id || productDetails.id;
+        const reviewsResult = await getProductReviews(productIdValue);
+        if (reviewsResult.success && reviewsResult.data?.reviews) {
+          setReviews(reviewsResult.data.reviews);
+        }
       } else {
         setSubmitStatus({ success: false, message: result.error?.message || "Failed to submit review" });
       }
@@ -367,102 +407,178 @@ function CartBody({ productId }) {
             )}
 
             {activeTab === "reviews" && (
-              <div className="max-w-lg mx-auto bg-white border rounded-lg p-6 shadow-sm">
+              <div className="max-w-4xl mx-auto">
 
-                <h2 className="text-center text-xl font-semibold mb-4">
-                  Submit a Review
-                </h2>
-
-                {/* Submit Status Message */}
-                {submitStatus.message && (
-                  <div className={`mb-4 p-3 rounded-md text-center ${
-                    submitStatus.success 
-                      ? "bg-green-100 text-green-700" 
-                      : "bg-red-100 text-red-700"
-                  }`}>
-                    {submitStatus.message}
-                  </div>
+                {/* Reviews List */}
+                {isReviewsLoading ? (
+                  <div className="text-center py-8 text-gray-500">Loading reviews...</div>
+                ) : (
+                  <>
+                    {reviews.length > 0 ? (
+                      <div className="space-y-6 mb-8">
+                        <h3 className="text-lg font-semibold text-gray-800">
+                          Customer Reviews ({reviews.length})
+                        </h3>
+                        
+                        {reviews.map((review) => (
+                          <div key={review.id} className="bg-white border rounded-lg p-4 shadow-sm">
+                            <div className="flex items-start gap-3">
+                              {/* Reviewer Avatar */}
+                              <div className="w-10 h-10 rounded-full bg-[#8F2C8C] text-white flex items-center justify-center font-semibold text-lg flex-shrink-0">
+                                {review.reviewer_name?.charAt(0).toUpperCase() || "A"}
+                              </div>
+                              
+                              <div className="flex-1">
+                                {/* Reviewer Name & Rating */}
+                                <div className="flex items-center justify-between">
+                                  <h4 className="font-medium text-gray-800">
+                                    {review.reviewer_name || "Anonymous"}
+                                  </h4>
+                                  <div className="text-yellow-400 text-sm">
+                                    {Array.from({ length: 5 }, (_, i) => (
+                                      <span key={i}>
+                                        {i < parseInt(review.rating) ? "★" : "☆"}
+                                      </span>
+                                    ))}
+                                  </div>
+                                </div>
+                                
+                                {/* Review Date */}
+                                <p className="text-xs text-gray-400 mt-1">
+                                  {review.created_at ? new Date(review.created_at).toLocaleDateString('en-US', {
+                                    year: 'numeric',
+                                    month: 'long',
+                                    day: 'numeric'
+                                  }) : ""}
+                                </p>
+                                
+                                {/* Review Text */}
+                                <p className="text-gray-600 mt-2">
+                                  {review.review}
+                                </p>
+                                
+                                {/* Review Image */}
+                                {review.review_image && (
+                                  <div className="mt-3">
+                                    <img 
+                                      src={review.review_image} 
+                                      alt="Review image" 
+                                      className="w-20 h-20 object-cover rounded-md border"
+                                    />
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-center py-8 text-gray-500 mb-8">
+                        No reviews yet. Be the first to review this product!
+                      </div>
+                    )}
+                  </>
                 )}
 
-                {/* Image Upload */}
-                <div className="flex justify-center mb-5">
-                  <label className="cursor-pointer flex flex-col items-center">
-                    <div className="w-24 h-24 border rounded-md flex items-center justify-center text-gray-400 text-4xl overflow-hidden">
-                      {reviewImage ? (
-                        <img 
-                          src={reviewImage instanceof File ? URL.createObjectURL(reviewImage) : reviewImage} 
-                          alt="Preview" 
-                          className="w-full h-full object-cover" 
-                        />
-                      ) : (
-                        "📷"
-                      )}
+                {/* Submit Review Form */}
+                <div className="bg-white border rounded-lg p-6 shadow-sm">
+
+                  <h2 className="text-center text-xl font-semibold mb-4">
+                    Submit a Review
+                  </h2>
+
+                  {/* Submit Status Message */}
+                  {submitStatus.message && (
+                    <div className={`mb-4 p-3 rounded-md text-center ${
+                      submitStatus.success 
+                        ? "bg-green-100 text-green-700" 
+                        : "bg-red-100 text-red-700"
+                    }`}>
+                      {submitStatus.message}
                     </div>
-                    <span className="text-xs text-gray-500 mt-1">
-                      {reviewImage ? "Change" : "Add Photo"}
-                    </span>
-                    <input 
-                      type="file" 
-                      className="hidden" 
-                      accept="image/*"
-                      onChange={handleImageUpload}
-                    />
-                  </label>
-                </div>
+                  )}
 
-                {/* Name */}
-                <input
-                  type="text"
-                  placeholder="Your Name"
-                  value={reviewerName}
-                  onChange={(e) => setReviewerName(e.target.value)}
-                  className="w-full border rounded-md px-4 py-2 mb-3 focus:outline-none focus:ring-2 focus:ring-[#8F2C8C]"
-                />
-
-                {/* Review */}
-                <textarea
-                  placeholder="Your Review"
-                  rows="4"
-                  value={reviewText}
-                  onChange={(e) => setReviewText(e.target.value)}
-                  className="w-full border rounded-md px-4 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-[#8F2C8C]"
-                />
-
-                {/* Rating */}
-                <div className="text-center mb-5">
-
-                  <p className="mb-2 text-gray-700 font-medium">
-                    Rate this product:
-                  </p>
-
-                  <div className="flex justify-center gap-2 text-2xl cursor-pointer">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <span
-                        key={star}
-                        className={`transition-colors duration-150 ${
-                          star <= (hoverRating || rating)
-                            ? "text-yellow-400"
-                            : "text-gray-300"
-                        }`}
-                        onClick={() => setRating(star === rating ? 0 : star)}
-                        onMouseEnter={() => setHoverRating(star)}
-                        onMouseLeave={() => setHoverRating(0)}
-                      >
-                        ★
+                  {/* Image Upload */}
+                  <div className="flex justify-center mb-5">
+                    <label className="cursor-pointer flex flex-col items-center">
+                      <div className="w-24 h-24 border rounded-md flex items-center justify-center text-gray-400 text-4xl overflow-hidden">
+                        {reviewImage ? (
+                          <img 
+                            src={reviewImage instanceof File ? URL.createObjectURL(reviewImage) : reviewImage} 
+                            alt="Preview" 
+                            className="w-full h-full object-cover" 
+                          />
+                        ) : (
+                          "📷"
+                        )}
+                      </div>
+                      <span className="text-xs text-gray-500 mt-1">
+                        {reviewImage ? "Change" : "Add Photo"}
                       </span>
-                    ))}
+                      <input 
+                        type="file" 
+                        className="hidden" 
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                      />
+                    </label>
                   </div>
 
-                </div>
+                  {/* Name */}
+                  <input
+                    type="text"
+                    placeholder="Your Name"
+                    value={reviewerName}
+                    onChange={(e) => setReviewerName(e.target.value)}
+                    className="w-full border rounded-md px-4 py-2 mb-3 focus:outline-none focus:ring-2 focus:ring-[#8F2C8C]"
+                  />
 
-                {/* Submit Button */}
-                <button 
-                  onClick={handleSubmitReview}
-                  disabled={isSubmitting}
-                  className="w-full bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 text-white py-2 rounded-md font-medium"
-                >
-                  {isSubmitting ? "Submitting..." : "Submit Review"}
-                </button>
+                  {/* Review */}
+                  <textarea
+                    placeholder="Your Review"
+                    rows="4"
+                    value={reviewText}
+                    onChange={(e) => setReviewText(e.target.value)}
+                    className="w-full border rounded-md px-4 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-[#8F2C8C]"
+                  />
+
+                  {/* Rating */}
+                  <div className="text-center mb-5">
+
+                    <p className="mb-2 text-gray-700 font-medium">
+                      Rate this product:
+                    </p>
+
+                    <div className="flex justify-center gap-2 text-2xl cursor-pointer">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <span
+                          key={star}
+                          className={`transition-colors duration-150 ${
+                            star <= (hoverRating || rating)
+                              ? "text-yellow-400"
+                              : "text-gray-300"
+                          }`}
+                          onClick={() => setRating(star === rating ? 0 : star)}
+                          onMouseEnter={() => setHoverRating(star)}
+                          onMouseLeave={() => setHoverRating(0)}
+                        >
+                          ★
+                        </span>
+                      ))}
+                    </div>
+
+                  </div>
+
+                  {/* Submit Button */}
+                  <button 
+                    onClick={handleSubmitReview}
+                    disabled={isSubmitting}
+                    className="w-full bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 text-white py-2 rounded-md font-medium"
+                  >
+                    {isSubmitting ? "Submitting..." : "Submit Review"}
+                  </button>
+
+                </div>
 
               </div>
             )}
