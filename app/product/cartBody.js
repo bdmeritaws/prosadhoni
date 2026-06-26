@@ -403,9 +403,12 @@ function CartBody({ productId }) {
           <div className="bg-gray-50 border rounded-md p-6 text-gray-700">
 
             {activeTab === "description" && (
-              <div>{productDetails.description}</div>
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: productDetails.description || "",
+                }}
+              />
             )}
-
             {activeTab === "reviews" && (
               <div className="max-w-4xl mx-auto">
 
@@ -583,13 +586,23 @@ function CartBody({ productId }) {
               </div>
             )}
 
-            {activeTab === "howto" && (
-              <div>Use daily for best results.</div>
+             {activeTab === "howto" && (
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: productDetails.how_to_use || "",
+                }}
+              />
             )}
 
-            {activeTab === "qa" && (
-              <div>No questions available.</div>
+                         {activeTab === "qa" && (
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: productDetails.faq || "",
+                }}
+              />
             )}
+
+
 
           </div>
 
